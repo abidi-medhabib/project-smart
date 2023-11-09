@@ -53,7 +53,7 @@ export const OverviewOpenTickets: FC<OverviewOpenTicketsProps> = (props) => {
         </Box>
       </Stack>
       <Divider />
-      <CardActions>
+      {/* <CardActions>
         <Button
           color="inherit"
           endIcon={
@@ -65,7 +65,7 @@ export const OverviewOpenTickets: FC<OverviewOpenTicketsProps> = (props) => {
         >
           See all tickets
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };

@@ -2,25 +2,15 @@ import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
 import debounce from 'lodash.debounce';
-import ArchiveIcon from '@untitled-ui/icons-react/build/esm/Archive';
-import EyeIcon from '@untitled-ui/icons-react/build/esm/Eye';
-import EyeOffIcon from '@untitled-ui/icons-react/build/esm/EyeOff';
-import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
-import XIcon from '@untitled-ui/icons-react/build/esm/X';
 import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Grid from '@mui/material/Unstable_Grid2';
-import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import Stack from '@mui/material/Stack';
-import SvgIcon from '@mui/material/SvgIcon';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
@@ -33,11 +23,12 @@ import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
 import type { Column, Member, Task } from 'src/types/kanban';
 
-import { TaskChecklist } from './task-checklist';
 import { TaskComment } from './task-comment';
 import { TaskCommentAdd } from './task-comment-add';
-import { TaskLabels } from './task-labels';
 import { TaskStatus } from './task-status';
+import { authApi } from 'src/api/auth';
+import { User } from 'src/types/user';
+import { TextField, MenuItem } from '@mui/material';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -101,17 +92,17 @@ interface TaskModalProps {
   onClose?: () => void;
   open?: boolean;
   taskId?: string;
+  projectId: string;
 }
 
 export const TaskModal: FC<TaskModalProps> = (props) => {
-  const { taskId, onClose, open = false, ...other } = props;
+  const { taskId, onClose, open = false, projectId, ...other } = props;
   const user = useMockedUser();
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);
   const column = useColumn(task?.columnId);
   const author = useAuthor(task?.authorId);
-  const assignees = useAssignees(task?.assigneesIds);
   const mdUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
   const [currentTab, setCurrentTab] = useState<string>('overview');
   const [nameCopy, setNameCopy] = useState<string>(task?.name || '');
@@ -152,6 +143,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.moveTask({
+            projectId: projectId,
             taskId: task!.id,
             position: 0,
             columnId,
@@ -170,6 +162,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.deleteTask({
+          projectId: projectId,
           taskId: task!.id,
         })
       );
@@ -185,6 +178,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
+            projectId: projectId,
             taskId: task!.id,
             update: {
               name,
@@ -233,9 +227,34 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         try {
           await dispatch(
             thunks.updateTask({
+              projectId: projectId,
               taskId: task!.id,
               update: {
                 description,
+              },
+            })
+          );
+        } catch (err) {
+          console.error(err);
+          toast.error('Something went wrong!');
+        }
+      }, debounceMs),
+    [dispatch, task]
+  );
+
+  const handleAssignTask = useMemo(
+    () =>
+      debounce(async (assigneeId: string) => {
+        if (task!.assigneesIds.includes(assigneeId)) {
+          return;
+        }
+        try {
+          await dispatch(
+            thunks.updateTask({
+              projectId: projectId,
+              taskId: task!.id,
+              update: {
+                assigneesIds: [...task!.assigneesIds, assigneeId],
               },
             })
           );
@@ -258,6 +277,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
+          projectId: projectId,
           taskId: task!.id,
           update: { isSubscribed: true },
         })
@@ -272,6 +292,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.updateTask({
+          projectId: projectId,
           taskId: task!.id,
           update: { isSubscribed: false },
         })
@@ -287,6 +308,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateTask({
+            projectId: projectId,
             taskId: task!.id,
             update: {
               labels,
@@ -305,6 +327,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     try {
       await dispatch(
         thunks.addChecklist({
+          projectId: projectId,
           taskId: task!.id,
           name: 'Untitled Checklist',
         })
@@ -320,6 +343,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateChecklist({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             update: { name },
@@ -338,6 +362,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.deleteChecklist({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
           })
@@ -355,6 +380,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.addCheckItem({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             name,
@@ -373,6 +399,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.deleteCheckItem({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             checkItemId,
@@ -391,6 +418,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             checkItemId,
@@ -412,6 +440,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             checkItemId,
@@ -433,6 +462,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.updateCheckItem({
+            projectId: projectId,
             taskId: task!.id,
             checklistId,
             checkItemId,
@@ -454,6 +484,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       try {
         await dispatch(
           thunks.addComment({
+            projectId: projectId,
             taskId: task!.id,
             message,
           })
@@ -474,6 +505,26 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       };
     });
   }, [columns]);
+
+  const [users, setUsers] = useState<User[]>([]);
+  const assignees = task
+    ? task.assigneesIds
+        .map((assigneeId: string) => users.find((u) => u.id === assigneeId))
+        .filter((assignee) => assignee !== undefined)
+    : [];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await authApi.getUsers({});
+      setUsers(response.data.filter((u) => u.role === 'Developper'));
+    };
+
+    fetchData();
+  }, []);
+
+  const assignToUser = (event: any) => {
+    handleAssignTask(event.target.value);
+  };
 
   const content =
     task && column ? (
@@ -499,7 +550,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               value={column.id}
             />
           </div>
-          <Stack
+          {/* <Stack
             justifyContent="flex-end"
             alignItems="center"
             direction="row"
@@ -530,7 +581,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 </SvgIcon>
               </IconButton>
             )}
-          </Stack>
+          </Stack> */}
         </Stack>
         <Box sx={{ px: 1 }}>
           <Input
@@ -568,10 +619,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             label="Overview"
           />
           <Tab
-            value="checklists"
-            label="Checklists"
-          />
-          <Tab
             value="comments"
             label="Comments"
           />
@@ -583,7 +630,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               container
               spacing={3}
             >
-              <Grid
+              {/* <Grid
                 xs={12}
                 sm={4}
               >
@@ -599,7 +646,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 sm={8}
               >
                 {author && <Avatar src={author.avatar || undefined} />}
-              </Grid>
+              </Grid> */}
               <Grid
                 xs={12}
                 sm={4}
@@ -621,22 +668,46 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   flexWrap="wrap"
                   spacing={1}
                 >
-                  <AvatarGroup max={5}>
-                    {assignees.map((assignee) => (
-                      <Avatar
-                        key={assignee.id}
-                        src={assignee.avatar || undefined}
-                      />
+                  <TextField
+                    fullWidth
+                    label="Role"
+                    name="role"
+                    onChange={assignToUser}
+                    select
+                    autoComplete="no"
+                  >
+                    {users.map((user) => (
+                      <MenuItem
+                        key={user.id}
+                        value={user.id}
+                      >
+                        {user.name}
+                      </MenuItem>
                     ))}
-                  </AvatarGroup>
-                  <IconButton disabled>
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  </IconButton>
+                  </TextField>
                 </Stack>
               </Grid>
               <Grid
+                xs={12}
+                sm={8}
+              >
+                <Stack
+                  alignItems="start"
+                  direction="row"
+                  flexWrap="wrap"
+                  spacing={2}
+                >
+                  {assignees.map((assignee: any) => (
+                    <Typography
+                      variant="caption"
+                      key={assignee.id}
+                    >
+                      {assignee.name}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Grid>
+              {/* <Grid
                 xs={12}
                 sm={4}
               >
@@ -646,8 +717,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   Attachments
                 </Typography>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={12}
                 sm={8}
               >
@@ -674,8 +745,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                     </SvgIcon>
                   </IconButton>
                 </Stack>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={12}
                 sm={4}
               >
@@ -685,8 +756,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   Due date
                 </Typography>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={12}
                 sm={8}
               >
@@ -707,8 +778,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   Labels
                 </Typography>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={12}
                 sm={8}
               >
@@ -727,8 +798,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   Description
                 </Typography>
-              </Grid>
-              <Grid
+              </Grid> */}
+              {/* <Grid
                 xs={12}
                 sm={8}
               >
@@ -748,45 +819,10 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                     p: 1,
                   }}
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
           )}
-          {currentTab === 'checklists' && (
-            <Stack spacing={2}>
-              {task.checklists.map((checklist) => (
-                <TaskChecklist
-                  key={checklist.id}
-                  checklist={checklist}
-                  onCheckItemAdd={(name) => handleCheckItemAdd(checklist.id, name)}
-                  onCheckItemDelete={(checkItemId) =>
-                    handleCheckItemDelete(checklist.id, checkItemId)
-                  }
-                  onCheckItemCheck={(checkItemId) =>
-                    handleCheckItemCheck(checklist.id, checkItemId)
-                  }
-                  onCheckItemUncheck={(checkItemId) =>
-                    handleCheckItemUncheck(checklist.id, checkItemId)
-                  }
-                  onCheckItemRename={(checkItemId, name) =>
-                    handleCheckItemRename(checklist.id, checkItemId, name)
-                  }
-                  onDelete={() => handleChecklistDelete(checklist.id)}
-                  onRename={(name) => handleChecklistRename(checklist.id, name)}
-                />
-              ))}
-              <Button
-                startIcon={
-                  <SvgIcon>
-                    <PlusIcon />
-                  </SvgIcon>
-                }
-                onClick={handleChecklistAdd}
-                variant="contained"
-              >
-                Add
-              </Button>
-            </Stack>
-          )}
+
           {currentTab === 'comments' && (
             <Stack spacing={2}>
               {task.comments.map((comment) => (

@@ -4,6 +4,30 @@ import { deepCopy } from 'src/utils/deep-copy';
 
 import { data } from './data';
 
+const STORAGE_KEY = 'board';
+const getPersistedBoard = (projectId: string): Board => {
+  try {
+    const storage = localStorage.getItem(STORAGE_KEY + `_${projectId}`);
+
+    if (!storage) {
+      return data.board;
+    }
+
+    return JSON.parse(storage) as Board;
+  } catch (err) {
+    console.error(err);
+    return data.board;
+  }
+};
+
+const persistBoard = (projectId: string, board: Board): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY + `_${projectId}`, JSON.stringify(board));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 // On server get current identity (user) from the request
 const user = {
   id: '5e86809283e28b96d2d38537',
@@ -15,17 +39,21 @@ const user = {
 // The reason for that is to create a db session wannabe strategy.
 // If something fails, we do not affect the original data until everything worked as expected.
 
-type GetBoardRequest = object;
+type GetBoardRequest = {
+  projectId: string;
+};
 
 type GetBoardResponse = Promise<Board>;
 
 type CreateColumnRequest = {
   name: string;
+  projectId: string;
 };
 
 type CreateColumnResponse = Promise<Column>;
 
 type UpdateColumnRequest = {
+  projectId: string;
   columnId: string;
   update: {
     name: string;
@@ -35,18 +63,21 @@ type UpdateColumnRequest = {
 type UpdateColumnResponse = Promise<Column>;
 
 type ClearColumnRequest = {
+  projectId: string;
   columnId: string;
 };
 
 type ClearColumnResponse = Promise<true>;
 
 type DeleteColumnRequest = {
+  projectId: string;
   columnId: string;
 };
 
 type DeleteColumnResponse = Promise<true>;
 
 type CreateTaskRequest = {
+  projectId: string;
   columnId: string;
   name: string;
 };
@@ -54,18 +85,21 @@ type CreateTaskRequest = {
 type CreateTaskResponse = Promise<Task>;
 
 type UpdateTaskRequest = {
+  projectId: string;
   taskId: string;
   update: {
     name?: string;
     description?: string;
     isSubscribed?: boolean;
     labels?: string[];
+    assigneesIds?: string[];
   };
 };
 
 type UpdateTaskResponse = Promise<Task>;
 
 type MoveTaskRequest = {
+  projectId: string;
   taskId: string;
   position: number;
   columnId?: string;
@@ -74,12 +108,14 @@ type MoveTaskRequest = {
 type MoveTaskResponse = Promise<true>;
 
 type DeleteTaskRequest = {
+  projectId: string;
   taskId: string;
 };
 
 type DeleteTaskResponse = Promise<true>;
 
 type AddCommentRequest = {
+  projectId: string;
   taskId: string;
   message: string;
 };
@@ -87,6 +123,7 @@ type AddCommentRequest = {
 type AddCommentResponse = Promise<Comment>;
 
 type AddChecklistRequest = {
+  projectId: string;
   taskId: string;
   name: string;
 };
@@ -94,6 +131,7 @@ type AddChecklistRequest = {
 type AddChecklistResponse = Promise<Checklist>;
 
 type UpdateChecklistRequest = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   update: {
@@ -104,6 +142,7 @@ type UpdateChecklistRequest = {
 type UpdateChecklistResponse = Promise<Checklist>;
 
 type DeleteChecklistRequest = {
+  projectId: string;
   taskId: string;
   checklistId: string;
 };
@@ -111,6 +150,7 @@ type DeleteChecklistRequest = {
 type DeleteChecklistResponse = Promise<true>;
 
 type AddCheckItemRequest = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   name: string;
@@ -119,6 +159,7 @@ type AddCheckItemRequest = {
 type AddCheckItemResponse = Promise<CheckItem>;
 
 type UpdateCheckItemRequest = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   checkItemId: string;
@@ -131,6 +172,7 @@ type UpdateCheckItemRequest = {
 type UpdateCheckItemResponse = Promise<CheckItem>;
 
 type DeleteCheckItemRequest = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   checkItemId: string;
@@ -139,8 +181,8 @@ type DeleteCheckItemRequest = {
 type DeleteCheckItemResponse = Promise<true>;
 
 class KanbanApi {
-  getBoard(request: GetBoardRequest = {}): GetBoardResponse {
-    return Promise.resolve(deepCopy(data.board));
+  getBoard(request: GetBoardRequest): GetBoardResponse {
+    return Promise.resolve(deepCopy(getPersistedBoard(request.projectId)));
   }
 
   createColumn(request: CreateColumnRequest): CreateColumnResponse {
@@ -149,7 +191,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard = deepCopy(data.board);
+        const clonedBoard = deepCopy(getPersistedBoard(request.projectId));
 
         // Create the new column
         const column: Column = {
@@ -161,7 +203,7 @@ class KanbanApi {
         clonedBoard.columns.push(column);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(column));
       } catch (err) {
@@ -177,7 +219,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to clear
         const column = clonedBoard.columns.find((column) => column.id === columnId);
@@ -191,7 +233,7 @@ class KanbanApi {
         Object.assign(column, update);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(column));
       } catch (err) {
@@ -207,7 +249,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to clear
         const column = clonedBoard.columns.find((column) => column.id === columnId);
@@ -224,7 +266,7 @@ class KanbanApi {
         column.taskIds = [];
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {
@@ -240,7 +282,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to remove
         const column = clonedBoard.columns.find((column) => column.id === columnId);
@@ -257,7 +299,7 @@ class KanbanApi {
         clonedBoard.columns = clonedBoard.columns.filter((column) => column.id !== columnId);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {
@@ -273,7 +315,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column where the new task will be added
         const column = clonedBoard.columns.find((column) => column.id === columnId);
@@ -306,7 +348,7 @@ class KanbanApi {
         column.taskIds.push(task.id);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(task));
       } catch (err) {
@@ -322,7 +364,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be updated
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -336,7 +378,7 @@ class KanbanApi {
         Object.assign(task, update);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(task));
       } catch (err) {
@@ -352,7 +394,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be moved
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -393,7 +435,7 @@ class KanbanApi {
         }
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {
@@ -409,7 +451,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be removed
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -431,7 +473,7 @@ class KanbanApi {
         }
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {
@@ -447,7 +489,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the comment will be added
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -469,7 +511,7 @@ class KanbanApi {
         task.comments.push(comment);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(comment));
       } catch (err) {
@@ -485,7 +527,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -506,7 +548,7 @@ class KanbanApi {
         task.checklists.push(checklist);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(checklist));
       } catch (err) {
@@ -522,7 +564,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that will be updated
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -544,7 +586,7 @@ class KanbanApi {
         Object.assign(checklist, update);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(checklist));
       } catch (err) {
@@ -560,7 +602,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that will be removed
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -574,7 +616,7 @@ class KanbanApi {
         task.checklists = task.checklists.filter((checklists) => checklists.id !== checklistId);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {
@@ -590,7 +632,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -619,7 +661,7 @@ class KanbanApi {
         checklist.checkItems.push(checkItem);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(checkItem));
       } catch (err) {
@@ -635,7 +677,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -665,7 +707,7 @@ class KanbanApi {
         Object.assign(checkItem, update);
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(deepCopy(checkItem));
       } catch (err) {
@@ -681,7 +723,7 @@ class KanbanApi {
     return new Promise((resolve, reject) => {
       try {
         // Make a deep copy
-        const clonedBoard: Board = deepCopy(data.board);
+        const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that contains the check item that will be removed
         const task = clonedBoard.tasks.find((task) => task.id === taskId);
@@ -705,7 +747,7 @@ class KanbanApi {
         );
 
         // Save changes
-        data.board = clonedBoard;
+        persistBoard(request.projectId, clonedBoard);
 
         resolve(true);
       } catch (err) {

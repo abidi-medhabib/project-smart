@@ -6,12 +6,7 @@ import { Layout as ProjectLayout } from 'src/layouts/project';
 
 const OverviewPage = lazy(() => import('src/pages/dashboard/index'));
 
-// Other
-const AccountPage = lazy(() => import('src/pages/dashboard/account'));
-const AnalyticsPage = lazy(() => import('src/pages/dashboard/analytics'));
-
 const KanbanPage = lazy(() => import('src/pages/dashboard/kanban'));
-const SkillPage = lazy(() => import('src/pages/skills/Skills'));
 
 export const projectRoutes: RouteObject[] = [
   {
@@ -31,7 +26,7 @@ export const projectRoutes: RouteObject[] = [
       {
         path: 'kanban',
         element: <KanbanPage />,
-      }
+      },
     ],
   },
 ];

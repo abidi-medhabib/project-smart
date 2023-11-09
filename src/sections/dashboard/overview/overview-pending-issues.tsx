@@ -53,7 +53,7 @@ export const OverviewPendingIssues: FC<OverviewPendingIssuesProps> = (props) => 
         </Box>
       </Stack>
       <Divider />
-      <CardActions>
+      {/* <CardActions>
         <Button
           color="inherit"
           endIcon={
@@ -65,7 +65,7 @@ export const OverviewPendingIssues: FC<OverviewPendingIssuesProps> = (props) => 
         >
           See all issues
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };

@@ -53,7 +53,7 @@ export const OverviewDoneTasks: FC<OverviewDoneTasksProps> = (props) => {
         </Box>
       </Stack>
       <Divider />
-      <CardActions>
+      {/* <CardActions>
         <Button
           color="inherit"
           endIcon={
@@ -65,7 +65,7 @@ export const OverviewDoneTasks: FC<OverviewDoneTasksProps> = (props) => {
         >
           See all tasks
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };

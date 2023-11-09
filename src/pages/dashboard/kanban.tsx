@@ -13,6 +13,7 @@ import { ColumnCard } from 'src/sections/dashboard/kanban/column-card';
 import { ColumnAdd } from 'src/sections/dashboard/kanban/column-add';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
+import { useParams } from 'react-router-dom';
 
 const useColumnsIds = (): string[] => {
   const { columns } = useSelector((state) => state.kanban);
@@ -20,12 +21,12 @@ const useColumnsIds = (): string[] => {
   return columns.allIds;
 };
 
-const useBoard = (): void => {
+const useBoard = (projectId: string): void => {
   const dispatch = useDispatch();
 
   const handleBoardGet = useCallback((): void => {
-    dispatch(thunks.getBoard());
-  }, [dispatch]);
+    dispatch(thunks.getBoard(projectId));
+  }, [dispatch, projectId]);
 
   useEffect(
     () => {
@@ -37,13 +38,14 @@ const useBoard = (): void => {
 };
 
 const Page = () => {
+  const params = useParams();
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
 
   usePageView();
 
-  useBoard();
+  useBoard(params.projectId!);
 
   const handleDragEnd = useCallback(
     async ({ source, destination, draggableId }: DropResult): Promise<void> => {
@@ -62,6 +64,7 @@ const Page = () => {
           // Moved to the same column on different position
           await dispatch(
             thunks.moveTask({
+              projectId: params.projectId!,
               taskId: draggableId,
               position: destination.index,
             })
@@ -70,6 +73,7 @@ const Page = () => {
           // Moved to another column
           await dispatch(
             thunks.moveTask({
+              projectId: params.projectId!,
               taskId: draggableId,
               position: destination.index,
               columnId: destination.droppableId,
@@ -89,6 +93,7 @@ const Page = () => {
       try {
         await dispatch(
           thunks.createColumn({
+            projectId: params.projectId!,
             name: name || 'Untitled Column',
           })
         );
@@ -106,6 +111,7 @@ const Page = () => {
       try {
         await dispatch(
           thunks.clearColumn({
+            projectId: params.projectId!,
             columnId,
           })
         );
@@ -123,6 +129,7 @@ const Page = () => {
       try {
         await dispatch(
           thunks.deleteColumn({
+            projectId: params.projectId!,
             columnId,
           })
         );
@@ -140,6 +147,7 @@ const Page = () => {
       try {
         await dispatch(
           thunks.updateColumn({
+            projectId: params.projectId!,
             columnId,
             update: { name },
           })
@@ -157,6 +165,7 @@ const Page = () => {
       try {
         await dispatch(
           thunks.createTask({
+            projectId: params.projectId!,
             columnId,
             name: name || 'Untitled Task',
           })
@@ -229,6 +238,7 @@ const Page = () => {
         onClose={handleTaskClose}
         open={!!currentTaskId}
         taskId={currentTaskId || undefined}
+        projectId={params.projectId!}
       />
     </>
   );

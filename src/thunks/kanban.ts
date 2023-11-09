@@ -3,15 +3,16 @@ import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
 
 const getBoard =
-  (): AppThunk =>
+  (projectId: string): AppThunk =>
   async (dispatch): Promise<void> => {
-    const data = await kanbanApi.getBoard();
+    const data = await kanbanApi.getBoard({ projectId });
 
     dispatch(slice.actions.getBoard(data));
   };
 
 type CreateColumnParams = {
   name: string;
+  projectId: string;
 };
 
 const createColumn =
@@ -24,6 +25,7 @@ const createColumn =
 
 type UpdateColumnParams = {
   columnId: string;
+  projectId: string;
   update: {
     name: string;
   };
@@ -39,6 +41,7 @@ const updateColumn =
 
 type ClearColumnParams = {
   columnId: string;
+  projectId: string;
 };
 
 const clearColumn =
@@ -51,6 +54,7 @@ const clearColumn =
 
 type DeleteColumnParams = {
   columnId: string;
+  projectId: string;
 };
 
 const deleteColumn =
@@ -63,6 +67,7 @@ const deleteColumn =
 
 type CreateTaskParams = {
   columnId: string;
+  projectId: string;
   name: string;
 };
 
@@ -75,12 +80,14 @@ const createTask =
   };
 
 type UpdateTaskParams = {
+  projectId: string;
   taskId: string;
   update: {
     name?: string;
     description?: string;
     isSubscribed?: boolean;
     labels?: string[];
+    assigneesIds?: string[];
   };
 };
 
@@ -93,6 +100,7 @@ const updateTask =
   };
 
 type MoveTaskParams = {
+  projectId: string;
   taskId: string;
   position: number;
   columnId?: string;
@@ -107,6 +115,7 @@ const moveTask =
   };
 
 type DeleteTaskParams = {
+  projectId: string;
   taskId: string;
 };
 
@@ -119,6 +128,7 @@ const deleteTask =
   };
 
 type AddCommentParams = {
+  projectId: string;
   taskId: string;
   message: string;
 };
@@ -137,6 +147,7 @@ const addComment =
   };
 
 type AddCheckListParams = {
+  projectId: string;
   taskId: string;
   name: string;
 };
@@ -155,6 +166,7 @@ const addChecklist =
   };
 
 type UpdateChecklistParams = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   update: { name: string };
@@ -174,6 +186,7 @@ const updateChecklist =
   };
 
 type DeleteChecklistParams = {
+  projectId: string;
   taskId: string;
   checklistId: string;
 };
@@ -187,6 +200,7 @@ const deleteChecklist =
   };
 
 type AddCheckItemParams = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   name: string;
@@ -207,6 +221,7 @@ const addCheckItem =
   };
 
 type UpdateCheckItemParams = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   checkItemId: string;
@@ -231,6 +246,7 @@ const updateCheckItem =
   };
 
 type DeleteCheckItemParams = {
+  projectId: string;
   taskId: string;
   checklistId: string;
   checkItemId: string;

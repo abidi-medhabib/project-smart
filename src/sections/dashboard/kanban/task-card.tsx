@@ -1,14 +1,8 @@
 import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import EyeIcon from '@untitled-ui/icons-react/build/esm/Eye';
-import FileCheck03Icon from '@untitled-ui/icons-react/build/esm/FileCheck03';
-import ListIcon from '@untitled-ui/icons-react/build/esm/List';
 import MessageDotsCircleIcon from '@untitled-ui/icons-react/build/esm/MessageDotsCircle';
-import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -85,16 +79,6 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
       }}
       {...other}
     >
-      {hasAttachments && (
-        <CardMedia
-          image={task.attachments[0].url}
-          sx={{
-            borderRadius: 1.5,
-            height: 120,
-            mb: 1,
-          }}
-        />
-      )}
       <Typography variant="subtitle1">{task.name}</Typography>
       {hasLabels && (
         <Box
@@ -128,21 +112,6 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
           spacing={2}
           sx={{ mt: 2 }}
         >
-          {task.isSubscribed && (
-            <SvgIcon color="action">
-              <EyeIcon />
-            </SvgIcon>
-          )}
-          {hasAttachments && (
-            <SvgIcon color="action">
-              <FileCheck03Icon />
-            </SvgIcon>
-          )}
-          {hasChecklists && (
-            <SvgIcon color="action">
-              <ListIcon />
-            </SvgIcon>
-          )}
           {hasComments && (
             <SvgIcon color="action">
               <MessageDotsCircleIcon />
@@ -150,14 +119,19 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
           )}
         </Stack>
         {hasAssignees && (
-          <AvatarGroup max={3}>
+          <Stack
+            direction={'row'}
+            spacing={1}
+          >
             {assignees.map((assignee) => (
-              <Avatar
+              <Typography
+                variant="caption"
                 key={assignee.id}
-                src={assignee.avatar || undefined}
-              />
+              >
+                {assignee.name}
+              </Typography>
             ))}
-          </AvatarGroup>
+          </Stack>
         )}
       </Stack>
     </Card>

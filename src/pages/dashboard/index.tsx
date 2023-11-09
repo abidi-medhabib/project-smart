@@ -12,11 +12,25 @@ import { OverviewPendingIssues } from 'src/sections/dashboard/overview/overview-
 import { OverviewOpenTickets } from 'src/sections/dashboard/overview/overview-open-tickets';
 import { t } from 'i18next';
 import { tokens } from 'src/locales/tokens';
+import { useSelector } from 'src/store';
+import type { Column } from 'src/types/kanban';
+
+const useColumn = (columnId: string): Column | undefined => {
+  return useSelector((state) => {
+    const { columns } = state.kanban;
+
+    return columns.byId[columnId];
+  });
+};
 
 const Page = () => {
   const settings = useSettings();
 
   usePageView();
+
+  const todoColumn = useColumn('5e849c39325dc5ef58e5a5db');
+  const progressColumn = useColumn('5e849c2b38d238c33e516755');
+  const doneColumn = useColumn('5e849c2b38d238c33e5146755');
 
   return (
     <>
@@ -52,21 +66,20 @@ const Page = () => {
               xs={12}
               md={4}
             >
-              <OverviewDoneTasks amount={31} />
+              <OverviewDoneTasks amount={doneColumn?.taskIds.length || 0} />
             </Grid>
             <Grid
               xs={12}
               md={4}
             >
-              <OverviewPendingIssues amount={12} />
+              <OverviewPendingIssues amount={progressColumn?.taskIds.length || 0} />
             </Grid>
             <Grid
               xs={12}
               md={4}
             >
-              <OverviewOpenTickets amount={5} />
+              <OverviewOpenTickets amount={todoColumn?.taskIds.length || 0} />
             </Grid>
-
           </Grid>
         </Container>
       </Box>
