@@ -1,8 +1,6 @@
 import type { ChangeEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Download01Icon from '@untitled-ui/icons-react/build/esm/Download01';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
-import Upload01Icon from '@untitled-ui/icons-react/build/esm/Upload01';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -27,10 +25,10 @@ interface Filters {
 
 interface UsersSearchState {
   filters: Filters;
-  page: number;
-  rowsPerPage: number;
-  sortBy: string;
-  sortDir: 'asc' | 'desc';
+  page?: number;
+  rowsPerPage?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
 }
 
 const useUsersSearch = () => {
@@ -38,10 +36,10 @@ const useUsersSearch = () => {
     filters: {
       query: undefined,
     },
-    page: 0,
-    rowsPerPage: 5,
-    sortBy: 'updatedAt',
-    sortDir: 'desc',
+    // page: 0,
+    // rowsPerPage: 5,
+    // sortBy: 'id',
+    // sortDir: 'desc',
   });
 
   const handleFiltersChange = useCallback((filters: Filters): void => {
@@ -125,6 +123,7 @@ const useUsersStore = (searchState: UsersSearchState) => {
 
   return {
     ...state,
+    handleRefresh: handleUsersGet,
   };
 };
 
@@ -217,7 +216,9 @@ const Page = () => {
       <UserModal
         onClose={handleTaskClose}
         open={openUserModal}
-        userId={undefined}/>
+        onRefresh={() => usersStore.handleRefresh()}
+        userId={undefined}
+      />
     </>
   );
 };

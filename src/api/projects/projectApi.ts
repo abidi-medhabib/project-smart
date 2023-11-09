@@ -1,8 +1,33 @@
-import { Project } from "src/types/project";
-import { projects } from "./data";
-import { deepCopy } from "src/utils/deep-copy";
-import { applySort } from "src/utils/apply-sort";
-import { applyPagination } from "src/utils/apply-pagination";
+import { Project } from 'src/types/project';
+import { deepCopy } from 'src/utils/deep-copy';
+import { applySort } from 'src/utils/apply-sort';
+import { applyPagination } from 'src/utils/apply-pagination';
+
+const STORAGE_KEY = 'projects';
+const getPersistedProjects = (): Project[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+
+    if (!data) {
+      return [];
+    }
+
+    return JSON.parse(data) as Project[];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+const persistProject = (user: Project): void => {
+  try {
+    const usersData = getPersistedProjects();
+    const data = JSON.stringify([...usersData, user]);
+    localStorage.setItem(STORAGE_KEY, data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 type GetProjectsRequest = {
   filters?: {
@@ -23,7 +48,7 @@ class ProjectsApi {
   getProjects(request: GetProjectsRequest = {}): GetProjectsResponse {
     const { filters, page, rowsPerPage, sortBy, sortDir } = request;
 
-    let data = deepCopy(projects) as Project[];
+    let data = deepCopy(getPersistedProjects()) as Project[];
     let count = data.length;
 
     if (typeof filters !== 'undefined') {
@@ -57,6 +82,10 @@ class ProjectsApi {
       data,
       count,
     });
+  }
+
+  saveProject(project: Project) {
+    persistProject(project);
   }
 }
 

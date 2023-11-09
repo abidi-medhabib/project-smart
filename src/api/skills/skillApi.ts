@@ -1,8 +1,33 @@
-import { Skill } from "src/types/skill";
-import { skills } from "./data";
-import { deepCopy } from "src/utils/deep-copy";
-import { applySort } from "src/utils/apply-sort";
-import { applyPagination } from "src/utils/apply-pagination";
+import { Skill } from 'src/types/skill';
+import { deepCopy } from 'src/utils/deep-copy';
+import { applySort } from 'src/utils/apply-sort';
+import { applyPagination } from 'src/utils/apply-pagination';
+
+const STORAGE_KEY = 'skills';
+const getPersistedSkills = (): Skill[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+
+    if (!data) {
+      return [];
+    }
+
+    return JSON.parse(data) as Skill[];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
+const persistSkill = (user: Skill): void => {
+  try {
+    const usersData = getPersistedSkills();
+    const data = JSON.stringify([...usersData, user]);
+    localStorage.setItem(STORAGE_KEY, data);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 type GetSkillsRequest = {
   filters?: {
@@ -23,7 +48,7 @@ class SkillsApi {
   getSkills(request: GetSkillsRequest = {}): GetSkillsResponse {
     const { filters, page, rowsPerPage, sortBy, sortDir } = request;
 
-    let data = deepCopy(skills) as Skill[];
+    let data = deepCopy(getPersistedSkills()) as Skill[];
     let count = data.length;
 
     if (typeof filters !== 'undefined') {
@@ -57,6 +82,10 @@ class SkillsApi {
       data,
       count,
     });
+  }
+
+  saveSkill(skill: Skill) {
+    persistSkill(skill);
   }
 }
 

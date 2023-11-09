@@ -19,6 +19,7 @@ import { useSelection } from 'src/hooks/use-selection';
 import { SkillListSearch } from './SkillListSearch';
 import { SkillListTable } from './SkillListTable';
 import type { Skill } from 'src/types/skill';
+import { SkillModal } from './skillModal/SkillModal';
 
 interface Filters {
   query?: string;
@@ -26,10 +27,10 @@ interface Filters {
 
 interface SkillsSearchState {
   filters: Filters;
-  page: number;
-  rowsPerPage: number;
-  sortBy: string;
-  sortDir: 'asc' | 'desc';
+  page?: number;
+  rowsPerPage?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
 }
 
 const useSkillsSearch = () => {
@@ -37,10 +38,10 @@ const useSkillsSearch = () => {
     filters: {
       query: undefined,
     },
-    page: 0,
-    rowsPerPage: 5,
-    sortBy: 'updatedAt',
-    sortDir: 'desc',
+    // page: 0,
+    // rowsPerPage: 5,
+    // sortBy: 'updatedAt',
+    // sortDir: 'desc',
   });
 
   const handleFiltersChange = useCallback((filters: Filters): void => {
@@ -124,6 +125,7 @@ const useSkillsStore = (searchState: SkillsSearchState) => {
 
   return {
     ...state,
+    handleRefresh: handleSkillsGet,
   };
 };
 
@@ -137,7 +139,17 @@ const Page = () => {
   const skillsSearch = useSkillsSearch();
   const skillsStore = useSkillsStore(skillsSearch.state);
   const skillsIds = useSkillsIds(skillsStore.skills);
-  const skillsSelection = useSelection<number>(skillsIds);
+  const skillsSelection = useSelection<string>(skillsIds);
+
+  const [openSkillModal, setOpenSkillModal] = useState<boolean>(false);
+
+  const handleTaskOpen = useCallback((): void => {
+    setOpenSkillModal(true);
+  }, []);
+
+  const handleTaskClose = useCallback((): void => {
+    setOpenSkillModal(false);
+  }, []);
 
   usePageView();
 
@@ -173,6 +185,7 @@ const Page = () => {
                     </SvgIcon>
                   }
                   variant="contained"
+                  onClick={handleTaskOpen}
                 >
                   Add
                 </Button>
@@ -202,6 +215,12 @@ const Page = () => {
           </Stack>
         </Container>
       </Box>
+      <SkillModal
+        onClose={handleTaskClose}
+        open={openSkillModal}
+        skillId={undefined}
+        onRefresh={() => skillsStore.handleRefresh()}
+      />
     </>
   );
 };

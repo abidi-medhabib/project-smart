@@ -25,14 +25,14 @@ interface ProjectListTableProps {
   count?: number;
   items?: Project[];
   onDeselectAll?: () => void;
-  onDeselectOne?: (projectId: number) => void;
+  onDeselectOne?: (projectId: string) => void;
   onPageChange?: (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll?: () => void;
-  onSelectOne?: (projectId: number) => void;
+  onSelectOne?: (projectId: string) => void;
   page?: number;
   rowsPerPage?: number;
-  selected?: number[];
+  selected?: string[];
 }
 
 export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
@@ -150,25 +150,25 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
                       spacing={1}
                     >
                       <Typography
-                          color="text.secondary"
-                          variant="body2"
-                        >
-                          {project.name}
-                        </Typography>
+                        color="text.secondary"
+                        variant="body2"
+                      >
+                        {project.name}
+                      </Typography>
                     </Stack>
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton
+                    {/* <IconButton
                       component={RouterLink}
-                      href="#"//{paths.dashboard.projects.edit}
+                      href="#" //{paths.dashboard.projects.edit}
                     >
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
-                    </IconButton>
+                    </IconButton> */}
                     <IconButton
                       component={RouterLink}
-                      href={paths.projects.index.replace(":projectId", project.id.toString())}
+                      href={paths.projects.index.replace(':projectId', project.id.toString())}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
@@ -181,7 +181,7 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
           </TableBody>
         </Table>
       </Scrollbar>
-      <TablePagination
+      {/* <TablePagination
         component="div"
         count={count}
         onPageChange={onPageChange}
@@ -189,7 +189,7 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
-      />
+      /> */}
     </Box>
   );
 };

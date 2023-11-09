@@ -5,45 +5,36 @@ import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import { Stack } from '@mui/system';
 
-import { Role } from 'src/types/user';
 import { useMounted } from 'src/hooks/use-mounted';
 import { authApi } from 'src/api/auth';
 import { createResourceId } from 'src/utils/create-resource-id';
+import { projectsApi } from 'src/api/projects/projectApi';
 
-interface UserValues {
-  email: string;
+interface ProjectValues {
   name: string;
-  role: Role;
-  password: string;
+  description: string;
   submit: null;
 }
 
-const initialValues: UserValues = {
-  email: '',
-  password: '',
+const initialValues: ProjectValues = {
   name: '',
-  role: 'Developper',
+  description: '',
   submit: null,
 };
 
 const validationSchema = Yup.object({
-  email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-  password: Yup.string().max(255).required('Password is required'),
   name: Yup.string().max(255).required('Name is required'),
-  role: Yup.mixed()
-    .oneOf(['Admin', 'Project Manager', 'Manager', 'Developper'])
-    .required('Name is required'),
 });
 
-interface UserModalProps {
+interface ProjectModalProps {
   onClose: () => void;
   onRefresh?: () => void;
   open: boolean;
-  userId?: string;
+  projectId?: string;
 }
 
-export const UserModal: FC<UserModalProps> = (props) => {
-  const { userId, onClose, onRefresh, open = false, ...other } = props;
+export const ProjectModal: FC<ProjectModalProps> = (props) => {
+  const { projectId, onClose, onRefresh, open = false, ...other } = props;
   const isMounted = useMounted();
 
   const formik = useFormik({
@@ -51,12 +42,10 @@ export const UserModal: FC<UserModalProps> = (props) => {
     validationSchema,
     onSubmit: async (values, helpers): Promise<void> => {
       try {
-        authApi.saveUser({
+        projectsApi.saveProject({
           id: createResourceId(),
-          email: values.email,
           name: values.name,
-          role: values.role,
-          password: values.password,
+          description: values.description,
         });
         if (onRefresh) {
           onRefresh();
@@ -140,46 +129,20 @@ export const UserModal: FC<UserModalProps> = (props) => {
                 />
                 <TextField
                   autoFocus
-                  error={!!(formik.touched.email && formik.errors.email)}
+                  error={!!(formik.touched.description && formik.errors.description)}
                   fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
-                  name="email"
+                  helperText={formik.touched.description && formik.errors.description}
+                  label="Description"
+                  name="description"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
-                  type="email"
-                  value={formik.values.email}
+                  type="text"
+                  value={formik.values.description}
                   autoComplete="no"
+                  multiline
+                  maxRows={6}
+                  style={{ height: 150 }}
                 />
-                <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
-                  name="password"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="password"
-                  value={formik.values.password}
-                  autoComplete="no"
-                />
-                <TextField
-                  error={!!(formik.touched.role && formik.errors.role)}
-                  fullWidth
-                  helperText={formik.touched.role && formik.errors.role}
-                  label="Role"
-                  name="role"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  select
-                  value={formik.values.role}
-                  autoComplete="no"
-                >
-                  <MenuItem value={'Admin'}>Admin</MenuItem>
-                  <MenuItem value={'Developper'}>Developper</MenuItem>
-                  <MenuItem value={'Manager'}>Manager</MenuItem>
-                  <MenuItem value={'Project Manager'}>Project Manager</MenuItem>
-                </TextField>
               </Stack>
               {formik.errors.submit && (
                 <FormHelperText

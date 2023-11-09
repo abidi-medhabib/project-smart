@@ -21,7 +21,7 @@ interface Filters {
   isReturning?: boolean;
 }
 
-type SortValue = 'updatedAt|desc' | 'updatedAt|asc' | 'totalOrders|desc' | 'totalOrders|asc';
+type SortValue = 'id|desc' | 'id|asc';
 
 interface SortOption {
   label: string;
@@ -31,12 +31,12 @@ interface SortOption {
 const sortOptions: SortOption[] = [
   {
     label: 'Last update (newest)',
-    value: 'updatedAt|desc',
+    value: 'id|desc',
   },
   {
     label: 'Last update (oldest)',
-    value: 'updatedAt|asc',
-  }
+    value: 'id|asc',
+  },
 ];
 
 type SortDir = 'asc' | 'desc';
@@ -109,7 +109,7 @@ export const UserListSearch: FC<UserListSearchProps> = (props) => {
             }
           />
         </Box>
-        <TextField
+        {/* <TextField
           label="Sort By"
           name="sort"
           onChange={handleSortChange}
@@ -125,7 +125,7 @@ export const UserListSearch: FC<UserListSearchProps> = (props) => {
               {option.label}
             </option>
           ))}
-        </TextField>
+        </TextField> */}
       </Stack>
     </>
   );

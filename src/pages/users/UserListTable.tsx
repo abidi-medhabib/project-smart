@@ -116,7 +116,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                 />
               </TableCell>
               <TableCell>Label</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>Role</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -149,38 +149,52 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                       spacing={1}
                     >
                       <Typography
-                          color="text.secondary"
-                          variant="body2"
-                        >
-                          {user.name}
-                        </Typography>
+                        color="text.secondary"
+                        variant="body2"
+                      >
+                        {user.name}
+                      </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align="right">
-                    <IconButton
+                  <TableCell>
+                    <Stack
+                      alignItems="center"
+                      direction="row"
+                      spacing={1}
+                    >
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                      >
+                        {user.role}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  {/* <TableCell align="right">
+                     <IconButton
                       component={RouterLink}
-                      href="#"//{paths.dashboard.users.edit}
+                      href="#" //{paths.dashboard.users.edit}
                     >
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
-                    </IconButton>
-                    <IconButton
+                    </IconButton> */}
+                  {/* <IconButton
                       component={RouterLink}
-                      href="#"//{paths.dashboard.users.details}
+                      href="#" //{paths.dashboard.users.details}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </Scrollbar>
-      <TablePagination
+      {/* <TablePagination
         component="div"
         count={count}
         onPageChange={onPageChange}
@@ -188,7 +202,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
-      />
+      /> */}
     </Box>
   );
 };

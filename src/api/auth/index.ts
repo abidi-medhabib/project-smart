@@ -15,10 +15,11 @@ const STORAGE_KEY = 'users';
 
 const getPersistedUsers = (): User[] => {
   try {
-    const data = sessionStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(STORAGE_KEY);
 
     if (!data) {
-      return [];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...users]));
+      return users;
     }
 
     return JSON.parse(data) as User[];
@@ -30,9 +31,9 @@ const getPersistedUsers = (): User[] => {
 
 const persistUser = (user: User): void => {
   try {
-    const users = getPersistedUsers();
-    const data = JSON.stringify([...users, user]);
-    sessionStorage.setItem(STORAGE_KEY, data);
+    const usersData = getPersistedUsers();
+    const data = JSON.stringify([...usersData, user]);
+    localStorage.setItem(STORAGE_KEY, data);
   } catch (err) {
     console.error(err);
   }
@@ -87,11 +88,8 @@ class AuthApi {
 
     return new Promise((resolve, reject) => {
       try {
-        // Merge static users (data file) with persisted users (browser storage)
-        const mergedUsers = [...users, ...getPersistedUsers()];
-
         // Find the user
-        const user = mergedUsers.find((user) => user.email === email);
+        const user = getPersistedUsers().find((user) => user.email === email);
 
         if (!user || user.password !== password) {
           reject(new Error('Please check your email and password'));
@@ -116,11 +114,8 @@ class AuthApi {
 
     return new Promise((resolve, reject) => {
       try {
-        // Merge static users (data file) with persisted users (browser storage)
-        const mergedUsers = [...users, ...getPersistedUsers()];
-
         // Check if a user already exists
-        let user = mergedUsers.find((user) => user.email === email);
+        let user = getPersistedUsers().find((user) => user.email === email);
 
         if (user) {
           reject(new Error('User already exists'));
@@ -132,7 +127,7 @@ class AuthApi {
           email,
           name,
           password,
-          role
+          role,
         };
 
         persistUser(user);
@@ -155,12 +150,9 @@ class AuthApi {
         // Decode access token
         const decodedToken = decode(accessToken) as any;
 
-        // Merge static users (data file) with persisted users (browser storage)
-        const mergedUsers = [...users, ...getPersistedUsers()];
-
         // Find the user
         const { userId } = decodedToken;
-        const user = mergedUsers.find((user) => user.id === userId);
+        const user = getPersistedUsers().find((user) => user.id === userId);
 
         if (!user) {
           reject(new Error('Invalid authorization token'));
@@ -183,7 +175,7 @@ class AuthApi {
   getUsers(request: GetUsersRequest = {}): GetUsersResponse {
     const { filters, page, rowsPerPage, sortBy, sortDir } = request;
 
-    let data = deepCopy(users) as User[];
+    let data = deepCopy(getPersistedUsers()) as User[];
     let count = data.length;
 
     if (typeof filters !== 'undefined') {
@@ -219,6 +211,10 @@ class AuthApi {
       data,
       count,
     });
+  }
+
+  saveUser(user: User) {
+    persistUser(user);
   }
 }
 

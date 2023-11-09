@@ -36,7 +36,7 @@ const sortOptions: SortOption[] = [
   {
     label: 'Last update (oldest)',
     value: 'updatedAt|asc',
-  }
+  },
 ];
 
 type SortDir = 'asc' | 'desc';
@@ -99,7 +99,7 @@ export const SkillListSearch: FC<SkillListSearchProps> = (props) => {
             defaultValue=""
             fullWidth
             inputProps={{ ref: queryRef }}
-            placeholder="Search customers"
+            placeholder="Search skills"
             startAdornment={
               <InputAdornment position="start">
                 <SvgIcon>
@@ -109,23 +109,6 @@ export const SkillListSearch: FC<SkillListSearchProps> = (props) => {
             }
           />
         </Box>
-        <TextField
-          label="Sort By"
-          name="sort"
-          onChange={handleSortChange}
-          select
-          SelectProps={{ native: true }}
-          value={`${sortBy}|${sortDir}`}
-        >
-          {sortOptions.map((option) => (
-            <option
-              key={option.value}
-              value={option.value}
-            >
-              {option.label}
-            </option>
-          ))}
-        </TextField>
       </Stack>
     </>
   );

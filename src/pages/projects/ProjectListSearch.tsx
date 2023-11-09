@@ -36,7 +36,7 @@ const sortOptions: SortOption[] = [
   {
     label: 'Last update (oldest)',
     value: 'updatedAt|asc',
-  }
+  },
 ];
 
 type SortDir = 'asc' | 'desc';
@@ -99,7 +99,7 @@ export const ProjectListSearch: FC<ProjectListSearchProps> = (props) => {
             defaultValue=""
             fullWidth
             inputProps={{ ref: queryRef }}
-            placeholder="Search customers"
+            placeholder="Search projects"
             startAdornment={
               <InputAdornment position="start">
                 <SvgIcon>
@@ -109,7 +109,7 @@ export const ProjectListSearch: FC<ProjectListSearchProps> = (props) => {
             }
           />
         </Box>
-        <TextField
+        {/* <TextField
           label="Sort By"
           name="sort"
           onChange={handleSortChange}
@@ -125,7 +125,7 @@ export const ProjectListSearch: FC<ProjectListSearchProps> = (props) => {
               {option.label}
             </option>
           ))}
-        </TextField>
+        </TextField> */}
       </Stack>
     </>
   );

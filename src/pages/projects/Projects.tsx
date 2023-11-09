@@ -17,6 +17,7 @@ import { useSelection } from 'src/hooks/use-selection';
 import { ProjectListSearch } from './ProjectListSearch';
 import { ProjectListTable } from './ProjectsListTable';
 import type { Project } from 'src/types/project';
+import { ProjectModal } from './projectModal/ProjectModal';
 
 interface Filters {
   query?: string;
@@ -24,10 +25,10 @@ interface Filters {
 
 interface ProjectsSearchState {
   filters: Filters;
-  page: number;
-  rowsPerPage: number;
-  sortBy: string;
-  sortDir: 'asc' | 'desc';
+  page?: number;
+  rowsPerPage?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
 }
 
 const useProjectsSearch = () => {
@@ -35,10 +36,10 @@ const useProjectsSearch = () => {
     filters: {
       query: undefined,
     },
-    page: 0,
-    rowsPerPage: 5,
-    sortBy: 'updatedAt',
-    sortDir: 'desc',
+    // page: 0,
+    // rowsPerPage: 5,
+    // sortBy: 'updatedAt',
+    // sortDir: 'desc',
   });
 
   const handleFiltersChange = useCallback((filters: Filters): void => {
@@ -122,6 +123,7 @@ const useProjectsStore = (searchState: ProjectsSearchState) => {
 
   return {
     ...state,
+    handleRefresh: handleProjectsGet,
   };
 };
 
@@ -135,7 +137,17 @@ const Page = () => {
   const projectsSearch = useProjectsSearch();
   const projectsStore = useProjectsStore(projectsSearch.state);
   const projectsIds = useProjectsIds(projectsStore.projects);
-  const projectsSelection = useSelection<number>(projectsIds);
+  const projectsSelection = useSelection<string>(projectsIds);
+
+  const [openProjectModal, setOpenProjectModal] = useState<boolean>(false);
+
+  const handleTaskOpen = useCallback((): void => {
+    setOpenProjectModal(true);
+  }, []);
+
+  const handleTaskClose = useCallback((): void => {
+    setOpenProjectModal(false);
+  }, []);
 
   usePageView();
 
@@ -171,6 +183,7 @@ const Page = () => {
                     </SvgIcon>
                   }
                   variant="contained"
+                  onClick={handleTaskOpen}
                 >
                   Add
                 </Button>
@@ -200,6 +213,12 @@ const Page = () => {
           </Stack>
         </Container>
       </Box>
+      <ProjectModal
+        onClose={handleTaskClose}
+        open={openProjectModal}
+        projectId={undefined}
+        onRefresh={() => projectsStore.handleRefresh()}
+      />
     </>
   );
 };

@@ -24,14 +24,14 @@ interface SkillListTableProps {
   count?: number;
   items?: Skill[];
   onDeselectAll?: () => void;
-  onDeselectOne?: (skillId: number) => void;
+  onDeselectOne?: (skillId: string) => void;
   onPageChange?: (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll?: () => void;
-  onSelectOne?: (skillId: number) => void;
+  onSelectOne?: (skillId: string) => void;
   page?: number;
   rowsPerPage?: number;
-  selected?: number[];
+  selected?: string[];
 }
 
 export const SkillListTable: FC<SkillListTableProps> = (props) => {
@@ -116,7 +116,7 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                 />
               </TableCell>
               <TableCell>Label</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              {/* <TableCell align="right">Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -149,17 +149,17 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                       spacing={1}
                     >
                       <Typography
-                          color="text.secondary"
-                          variant="body2"
-                        >
-                          {skill.label}
-                        </Typography>
+                        color="text.secondary"
+                        variant="body2"
+                      >
+                        {skill.label}
+                      </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align="right">
+                  {/* <TableCell align="right">
                     <IconButton
                       component={RouterLink}
-                      href="#"//{paths.dashboard.skills.edit}
+                      href="#" //{paths.dashboard.skills.edit}
                     >
                       <SvgIcon>
                         <Edit02Icon />
@@ -167,20 +167,20 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                     </IconButton>
                     <IconButton
                       component={RouterLink}
-                      href="#"//{paths.dashboard.skills.details}
+                      href="#" //{paths.dashboard.skills.details}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </Scrollbar>
-      <TablePagination
+      {/* <TablePagination
         component="div"
         count={count}
         onPageChange={onPageChange}
@@ -188,7 +188,7 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
-      />
+      /> */}
     </Box>
   );
 };
