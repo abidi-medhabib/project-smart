@@ -200,7 +200,7 @@ const Page = () => {
         }}
       >
         <Box sx={{ px: 3 }}>
-          <Typography variant="h4">Kanban</Typography>
+          <Typography variant="h4">Affectation des Tâches</Typography>
         </Box>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Box

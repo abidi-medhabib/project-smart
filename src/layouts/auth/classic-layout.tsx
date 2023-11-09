@@ -56,7 +56,7 @@ export const Layout: FC<LayoutProps> = (props) => {
               spacing={1}
               sx={{ textDecoration: 'none' }}
             >
-              <Box
+              {/* <Box
                 sx={{
                   display: 'inline-flex',
                   height: 24,
@@ -64,8 +64,8 @@ export const Layout: FC<LayoutProps> = (props) => {
                 }}
               >
                 <Logo />
-              </Box>
-              <Box
+              </Box> */}
+              {/* <Box
                 sx={{
                   color: 'text.primary',
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -79,7 +79,7 @@ export const Layout: FC<LayoutProps> = (props) => {
                 }}
               >
                 Devias Kit <span>PRO</span>
-              </Box>
+              </Box> */}
             </Stack>
           </Stack>
         </Container>

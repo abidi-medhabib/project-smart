@@ -29,7 +29,7 @@ export const fr = {
   [tokens.nav.forgotPassword]: 'Forgot Password',
   [tokens.nav.invoiceList]: 'Invoices',
   [tokens.nav.jobList]: 'Job Listings',
-  [tokens.nav.kanban]: 'Kanban',
+  [tokens.nav.kanban]: 'Affectation des Tâches',
   [tokens.nav.list]: 'List',
   [tokens.nav.login]: 'Login',
   [tokens.nav.logistics]: 'Logistics',
@@ -51,5 +51,5 @@ export const fr = {
   [tokens.nav.skills]: 'Compétences',
   [tokens.nav.skillMatrix]: 'Matrice des compétences',
   [tokens.nav.users]: 'Utilisateurs',
-  [tokens.nav.projects]: 'Projets'
+  [tokens.nav.projects]: 'Projets',
 };
