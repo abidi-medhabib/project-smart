@@ -509,7 +509,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   const [users, setUsers] = useState<User[]>([]);
   const assignees = task
     ? task.assigneesIds
-        .map((assigneeId: string) => users.find((u) => u.id === assigneeId))
+        .map((assigneeId: string) => users.find((u) => u._id === assigneeId))
         .filter((assignee) => assignee !== undefined)
     : [];
 
@@ -678,8 +678,8 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   >
                     {users.map((user) => (
                       <MenuItem
-                        key={user.id}
-                        value={user.id}
+                        key={user._id}
+                        value={user._id}
                       >
                         {user.name}
                       </MenuItem>

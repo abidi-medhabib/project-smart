@@ -122,12 +122,12 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
           </TableHead>
           <TableBody>
             {items.map((project) => {
-              const isSelected = selected.includes(project.id);
+              const isSelected = selected.includes(project._id);
 
               return (
                 <TableRow
                   hover
-                  key={project.id}
+                  key={project._id}
                   selected={isSelected}
                 >
                   <TableCell padding="checkbox">
@@ -135,9 +135,9 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
                       checked={isSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                         if (event.target.checked) {
-                          onSelectOne?.(project.id);
+                          onSelectOne?.(project._id);
                         } else {
-                          onDeselectOne?.(project.id);
+                          onDeselectOne?.(project._id);
                         }
                       }}
                       value={isSelected}
@@ -168,7 +168,7 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
                     </IconButton> */}
                     <IconButton
                       component={RouterLink}
-                      href={paths.projects.index.replace(':projectId', project.id.toString())}
+                      href={paths.projects.index.replace(':projectId', project._id.toString())}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />

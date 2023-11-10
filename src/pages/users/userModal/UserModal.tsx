@@ -9,6 +9,8 @@ import { Role } from 'src/types/user';
 import { useMounted } from 'src/hooks/use-mounted';
 import { authApi } from 'src/api/auth';
 import { createResourceId } from 'src/utils/create-resource-id';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 interface UserValues {
   email: string;
@@ -52,12 +54,26 @@ export const UserModal: FC<UserModalProps> = (props) => {
     onSubmit: async (values, helpers): Promise<void> => {
       try {
         authApi.saveUser({
-          id: createResourceId(),
+          _id: createResourceId(),
           email: values.email,
           name: values.name,
           role: values.role,
           password: values.password,
         });
+
+        const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+        await axios({
+          method: 'post',
+          url: 'http://localhost:8080/api/users',
+          headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+          data: {
+            email: values.email,
+            name: values.name,
+            role: values.role,
+            password: values.password,
+          },
+        });
+
         if (onRefresh) {
           onRefresh();
         }

@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { useCallback, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 import { authApi } from 'src/api/auth';
 import type { User } from 'src/types/user';
@@ -9,12 +10,12 @@ import { Issuer } from 'src/utils/auth';
 import type { State } from './auth-context';
 import { AuthContext, initialState } from './auth-context';
 
-const STORAGE_KEY = 'accessToken';
+export const TOKEN_STORAGE_KEY = 'accessToken';
+export const STORAGE_USER_KEY = 'me';
 
 enum ActionType {
   INITIALIZE = 'INITIALIZE',
   SIGN_IN = 'SIGN_IN',
-  SIGN_UP = 'SIGN_UP',
   SIGN_OUT = 'SIGN_OUT',
 }
 
@@ -33,18 +34,11 @@ type SignInAction = {
   };
 };
 
-type SignUpAction = {
-  type: ActionType.SIGN_UP;
-  payload: {
-    user: User;
-  };
-};
-
 type SignOutAction = {
   type: ActionType.SIGN_OUT;
 };
 
-type Action = InitializeAction | SignInAction | SignUpAction | SignOutAction;
+type Action = InitializeAction | SignInAction | SignOutAction;
 
 type Handler = (state: State, action: any) => State;
 
@@ -60,15 +54,6 @@ const handlers: Record<ActionType, Handler> = {
     };
   },
   SIGN_IN: (state: State, action: SignInAction): State => {
-    const { user } = action.payload;
-
-    return {
-      ...state,
-      isAuthenticated: true,
-      user,
-    };
-  },
-  SIGN_UP: (state: State, action: SignUpAction): State => {
     const { user } = action.payload;
 
     return {
@@ -97,16 +82,16 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
 
   const initialize = useCallback(async (): Promise<void> => {
     try {
-      const accessToken = window.sessionStorage.getItem(STORAGE_KEY);
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
 
       if (accessToken) {
-        const user = await authApi.me({ accessToken });
+        const userData = window.sessionStorage.getItem(STORAGE_USER_KEY);
 
         dispatch({
           type: ActionType.INITIALIZE,
           payload: {
             isAuthenticated: true,
-            user,
+            user: userData ? (JSON.parse(userData) as User) : null,
           },
         });
       } else {
@@ -140,10 +125,24 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
 
   const signIn = useCallback(
     async (email: string, password: string): Promise<void> => {
-      const { accessToken } = await authApi.signIn({ email, password });
-      const user = await authApi.me({ accessToken });
+      const res = await axios({
+        method: 'post',
+        url: 'http://localhost:8080/api/auth/signin',
+        data: {
+          email: email,
+          password: password,
+        },
+      });
+      const { accessToken } = res.data;
+      const user: User = {
+        email: res.data.email,
+        _id: res.data.id,
+        name: res.data.name,
+        role: res.data.role,
+      };
 
-      sessionStorage.setItem(STORAGE_KEY, accessToken);
+      sessionStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
+      sessionStorage.setItem(STORAGE_USER_KEY, JSON.stringify(user));
 
       dispatch({
         type: ActionType.SIGN_IN,
@@ -155,25 +154,8 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     [dispatch]
   );
 
-  const signUp = useCallback(
-    async (email: string, name: string, password: string): Promise<void> => {
-      const { accessToken } = await authApi.signUp({ email, name, password });
-      const user = await authApi.me({ accessToken });
-
-      sessionStorage.setItem(STORAGE_KEY, accessToken);
-
-      dispatch({
-        type: ActionType.SIGN_UP,
-        payload: {
-          user,
-        },
-      });
-    },
-    [dispatch]
-  );
-
   const signOut = useCallback(async (): Promise<void> => {
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
     dispatch({ type: ActionType.SIGN_OUT });
   }, [dispatch]);
 
@@ -183,7 +165,6 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
         ...state,
         issuer: Issuer.JWT,
         signIn,
-        signUp,
         signOut,
       }}
     >

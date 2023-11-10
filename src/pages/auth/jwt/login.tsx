@@ -128,25 +128,6 @@ const Page = () => {
             </form>
           </CardContent>
         </Card>
-        <Stack
-          spacing={3}
-          sx={{ mt: 3 }}
-        >
-          <Alert severity="error">
-            <div>
-              You can use :
-            </div>
-            <div>
-              <b>hr@test.com</b> and password <b>Password123!</b>
-            </div>
-            <div>
-              <b>resp@test.com</b> and password <b>Password123!</b>
-            </div>
-            <div>
-              <b>dev@test.com</b> and password <b>Password123!</b>
-            </div>
-          </Alert>
-        </Stack>
       </div>
     </>
   );

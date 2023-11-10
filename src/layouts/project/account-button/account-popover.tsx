@@ -37,7 +37,6 @@ export const AccountPopover: FC<AccountPopoverProps> = (props) => {
       onClose?.();
 
       switch (auth.issuer) {
-
         case Issuer.JWT: {
           await auth.signOut();
           break;
@@ -49,6 +48,7 @@ export const AccountPopover: FC<AccountPopoverProps> = (props) => {
       }
 
       router.push(paths.index);
+      window.location.reload();
     } catch (err) {
       console.error(err);
       toast.error('Something went wrong!');
@@ -84,7 +84,7 @@ export const AccountPopover: FC<AccountPopoverProps> = (props) => {
         </Typography>
       </Box>
       <Divider />
-      <Box sx={{ p: 1 }}>
+      {/* <Box sx={{ p: 1 }}>
         <ListItemButton
           component={RouterLink}
           href={paths.main.account}
@@ -102,7 +102,7 @@ export const AccountPopover: FC<AccountPopoverProps> = (props) => {
           </ListItemIcon>
           <ListItemText primary={<Typography variant="body1">Settings</Typography>} />
         </ListItemButton>
-      </Box>
+      </Box> */}
       <Divider sx={{ my: '0 !important' }} />
       <Box
         sx={{

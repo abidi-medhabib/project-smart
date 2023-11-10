@@ -30,20 +30,8 @@ interface TopNavProps {
 export const TopNav: FC<TopNavProps> = (props) => {
   const { onMobileNavOpen, ...other } = props;
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
-  const [projectName, setProjectName] = useState<string | undefined>();
   const params = useParams();
   //const projectsStore = useProjectsStore({ filters: {} });
-
-  useEffect(() => {
-    const getProjectName = async () => {
-      if (params.projectId) {
-        const response = await projectsApi.getProjects({ filters: {} });
-        setProjectName(response.data.find((p) => p.id === params.projectId)?.name);
-      }
-    };
-
-    getProjectName();
-  }, [params]);
 
   return (
     <Box
@@ -85,7 +73,7 @@ export const TopNav: FC<TopNavProps> = (props) => {
               </SvgIcon>
             </IconButton>
           )}
-          {projectName && (
+          {params.projectId && (
             <Stack
               direction="row"
               spacing={1}
@@ -103,7 +91,7 @@ export const TopNav: FC<TopNavProps> = (props) => {
                 <Typography variant="subtitle2">Home</Typography>
               </Link>
               <Typography variant="subtitle2">{`>`}</Typography>
-              <Typography variant="subtitle2">{projectName}</Typography>
+              <Typography variant="subtitle2">{`Project deails`}</Typography>
             </Stack>
           )}
         </Stack>

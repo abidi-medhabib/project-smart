@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { kanbanApi } from 'src/api/kanban';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
 import { slice } from 'src/slices/kanban';
 import type { AppThunk } from 'src/store';
 
@@ -6,6 +8,12 @@ const getBoard =
   (projectId: string): AppThunk =>
   async (dispatch): Promise<void> => {
     const data = await kanbanApi.getBoard({ projectId });
+    // const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    // const response = await axios({
+    //   method: 'get',
+    //   url: `http://localhost:8080/api/board/${projectId}`,
+    //   headers: { 'x-access-token': accessToken },
+    // });
 
     dispatch(slice.actions.getBoard(data));
   };

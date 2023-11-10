@@ -1,40 +1,34 @@
 import type { ChangeEvent, FC, MouseEvent } from 'react';
 import PropTypes from 'prop-types';
-import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
-import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import SvgIcon from '@mui/material/SvgIcon';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 
-import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
-import type { User } from 'src/types/user';
+import type { UserSkills } from 'src/types/userSkills';
 
-interface UserListTableProps {
+interface UserSkillsListTableProps {
   count?: number;
-  items?: User[];
+  items?: UserSkills[];
   onDeselectAll?: () => void;
-  onDeselectOne?: (userId: string) => void;
+  onDeselectOne?: (userSkillsId: string) => void;
   onPageChange?: (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll?: () => void;
-  onSelectOne?: (userId: string) => void;
+  onSelectOne?: (userSkillsId: string) => void;
   page?: number;
   rowsPerPage?: number;
   selected?: string[];
 }
 
-export const UserListTable: FC<UserListTableProps> = (props) => {
+export const SkillMatrixListTable: FC<UserSkillsListTableProps> = (props) => {
   const {
     count = 0,
     items = [],
@@ -116,18 +110,19 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                 />
               </TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Login</TableCell>
-              <TableCell>Role</TableCell>
+              <TableCell>Skill</TableCell>
+              <TableCell>Level</TableCell>
+              {/* <TableCell align="right">Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((user) => {
-              const isSelected = selected.includes(user._id);
+            {items.map((userSkills) => {
+              const isSelected = selected.includes(userSkills._id);
 
               return (
                 <TableRow
                   hover
-                  key={user._id}
+                  key={userSkills._id}
                   selected={isSelected}
                 >
                   <TableCell padding="checkbox">
@@ -135,9 +130,9 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                       checked={isSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                         if (event.target.checked) {
-                          onSelectOne?.(user._id);
+                          onSelectOne?.(userSkills._id);
                         } else {
-                          onDeselectOne?.(user._id);
+                          onDeselectOne?.(userSkills._id);
                         }
                       }}
                       value={isSelected}
@@ -153,7 +148,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                         color="text.secondary"
                         variant="body2"
                       >
-                        {user.name}
+                        {userSkills.name}
                       </Typography>
                     </Stack>
                   </TableCell>
@@ -167,7 +162,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                         color="text.secondary"
                         variant="body2"
                       >
-                        {user.email}
+                        {userSkills.skill}
                       </Typography>
                     </Stack>
                   </TableCell>
@@ -181,22 +176,22 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                         color="text.secondary"
                         variant="body2"
                       >
-                        {user.role}
+                        {userSkills.level}
                       </Typography>
                     </Stack>
                   </TableCell>
                   {/* <TableCell align="right">
-                     <IconButton
+                    <IconButton
                       component={RouterLink}
-                      href="#" //{paths.dashboard.users.edit}
+                      href="#" //{paths.dashboard.userSkillss.edit}
                     >
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
-                    </IconButton> */}
-                  {/* <IconButton
+                    </IconButton>
+                    <IconButton
                       component={RouterLink}
-                      href="#" //{paths.dashboard.users.details}
+                      href="#" //{paths.dashboard.userSkillss.details}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
@@ -222,7 +217,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
   );
 };
 
-UserListTable.propTypes = {
+SkillMatrixListTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,

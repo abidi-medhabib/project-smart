@@ -9,6 +9,8 @@ import { useMounted } from 'src/hooks/use-mounted';
 import { authApi } from 'src/api/auth';
 import { createResourceId } from 'src/utils/create-resource-id';
 import { skillsApi } from 'src/api/skills/skillApi';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 interface SkillValues {
   label: string;
@@ -40,10 +42,16 @@ export const SkillModal: FC<SkillModalProps> = (props) => {
     validationSchema,
     onSubmit: async (values, helpers): Promise<void> => {
       try {
-        skillsApi.saveSkill({
-          id: createResourceId(),
-          label: values.label,
+        const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+        await axios({
+          method: 'post',
+          url: 'http://localhost:8080/api/skills',
+          headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+          data: {
+            label: values.label,
+          },
         });
+
         if (onRefresh) {
           onRefresh();
         }

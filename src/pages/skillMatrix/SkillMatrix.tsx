@@ -1,8 +1,6 @@
 import type { ChangeEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Download01Icon from '@untitled-ui/icons-react/build/esm/Download01';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
-import Upload01Icon from '@untitled-ui/icons-react/build/esm/Upload01';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -11,23 +9,22 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
-import { skillsApi } from 'src/api/skills/skillApi';
 import { Seo } from 'src/components/seo';
 import { useMounted } from 'src/hooks/use-mounted';
 import { usePageView } from 'src/hooks/use-page-view';
 import { useSelection } from 'src/hooks/use-selection';
-import { SkillListSearch } from './SkillListSearch';
-import { SkillListTable } from './SkillListTable';
-import type { Skill } from 'src/types/skill';
-import { SkillModal } from './skillModal/SkillModal';
+import { SkillMatrixListSearch } from './SkillMatrixListSearch';
+import { SkillMatrixListTable } from './SkillMatrixListTable';
+import type { UserSkills } from 'src/types/userSkills';
 import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
 import axios from 'axios';
+import { SkillMatrixModal } from './skillMatrixModal/SkillMatrixModal';
 
 interface Filters {
   query?: string;
 }
 
-interface SkillsSearchState {
+interface UserSkillsSearchState {
   filters: Filters;
   page?: number;
   rowsPerPage?: number;
@@ -35,8 +32,8 @@ interface SkillsSearchState {
   sortDir?: 'asc' | 'desc';
 }
 
-const useSkillsSearch = () => {
-  const [state, setState] = useState<SkillsSearchState>({
+const useUserSkillsSearch = () => {
+  const [state, setState] = useState<UserSkillsSearchState>({
     filters: {
       query: undefined,
     },
@@ -90,31 +87,31 @@ const useSkillsSearch = () => {
   };
 };
 
-interface SkillsStoreState {
-  skills: Skill[];
-  skillsCount: number;
+interface UserSkillsStoreState {
+  userSkillss: UserSkills[];
+  userSkillssCount: number;
 }
 
-const useSkillsStore = (searchState: SkillsSearchState) => {
+const useUserSkillsStore = (searchState: UserSkillsSearchState) => {
   const isMounted = useMounted();
-  const [state, setState] = useState<SkillsStoreState>({
-    skills: [],
-    skillsCount: 0,
+  const [state, setState] = useState<UserSkillsStoreState>({
+    userSkillss: [],
+    userSkillssCount: 0,
   });
 
-  const handleSkillsGet = useCallback(async () => {
+  const handleUserSkillsGet = useCallback(async () => {
     try {
       const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
       const response = await axios({
         method: 'get',
-        url: 'http://localhost:8080/api/skills',
+        url: 'http://localhost:8080/api/user-skills',
         headers: { 'x-access-token': accessToken },
       });
 
       if (isMounted()) {
         setState({
-          skills: response.data.skills,
-          skillsCount: response.data.skills.count,
+          userSkillss: response.data.userSkills,
+          userSkillssCount: response.data.userSkills.count,
         });
       }
     } catch (err) {
@@ -124,7 +121,7 @@ const useSkillsStore = (searchState: SkillsSearchState) => {
 
   useEffect(
     () => {
-      handleSkillsGet();
+      handleUserSkillsGet();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchState]
@@ -132,37 +129,37 @@ const useSkillsStore = (searchState: SkillsSearchState) => {
 
   return {
     ...state,
-    handleRefresh: handleSkillsGet,
+    handleRefresh: handleUserSkillsGet,
   };
 };
 
-const useSkillsIds = (skills: Skill[] = []) => {
+const useUserSkillsIds = (userSkillss: UserSkills[] = []) => {
   return useMemo(() => {
-    return skills.map((customer) => customer._id);
-  }, [skills]);
+    return userSkillss.map((customer) => customer._id);
+  }, [userSkillss]);
 };
 
 const Page = () => {
-  const skillsSearch = useSkillsSearch();
-  const skillsStore = useSkillsStore(skillsSearch.state);
-  const skillsIds = useSkillsIds(skillsStore.skills);
-  const skillsSelection = useSelection<string>(skillsIds);
+  const userSkillssSearch = useUserSkillsSearch();
+  const userSkillssStore = useUserSkillsStore(userSkillssSearch.state);
+  const userSkillssIds = useUserSkillsIds(userSkillssStore.userSkillss);
+  const userSkillssSelection = useSelection<string>(userSkillssIds);
 
-  const [openSkillModal, setOpenSkillModal] = useState<boolean>(false);
+  const [openUserSkillsModal, setOpenUserSkillsModal] = useState<boolean>(false);
 
   const handleTaskOpen = useCallback((): void => {
-    setOpenSkillModal(true);
+    setOpenUserSkillsModal(true);
   }, []);
 
   const handleTaskClose = useCallback((): void => {
-    setOpenSkillModal(false);
+    setOpenUserSkillsModal(false);
   }, []);
 
   usePageView();
 
   return (
     <>
-      <Seo title="Skill List" />
+      <Seo title="UserSkills List" />
       <Box
         component="main"
         sx={{
@@ -178,7 +175,7 @@ const Page = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Skills</Typography>
+                <Typography variant="h4">Skills Matrix</Typography>
               </Stack>
               <Stack
                 alignItems="center"
@@ -199,34 +196,34 @@ const Page = () => {
               </Stack>
             </Stack>
             <Card>
-              <SkillListSearch
-                onFiltersChange={skillsSearch.handleFiltersChange}
-                onSortChange={skillsSearch.handleSortChange}
-                sortBy={skillsSearch.state.sortBy}
-                sortDir={skillsSearch.state.sortDir}
+              <SkillMatrixListSearch
+                onFiltersChange={userSkillssSearch.handleFiltersChange}
+                onSortChange={userSkillssSearch.handleSortChange}
+                sortBy={userSkillssSearch.state.sortBy}
+                sortDir={userSkillssSearch.state.sortDir}
               />
-              <SkillListTable
-                count={skillsStore.skillsCount}
-                items={skillsStore.skills}
-                onDeselectAll={skillsSelection.handleDeselectAll}
-                onDeselectOne={skillsSelection.handleDeselectOne}
-                onPageChange={skillsSearch.handlePageChange}
-                onRowsPerPageChange={skillsSearch.handleRowsPerPageChange}
-                onSelectAll={skillsSelection.handleSelectAll}
-                onSelectOne={skillsSelection.handleSelectOne}
-                page={skillsSearch.state.page}
-                rowsPerPage={skillsSearch.state.rowsPerPage}
-                selected={skillsSelection.selected}
+              <SkillMatrixListTable
+                count={userSkillssStore.userSkillssCount}
+                items={userSkillssStore.userSkillss}
+                onDeselectAll={userSkillssSelection.handleDeselectAll}
+                onDeselectOne={userSkillssSelection.handleDeselectOne}
+                onPageChange={userSkillssSearch.handlePageChange}
+                onRowsPerPageChange={userSkillssSearch.handleRowsPerPageChange}
+                onSelectAll={userSkillssSelection.handleSelectAll}
+                onSelectOne={userSkillssSelection.handleSelectOne}
+                page={userSkillssSearch.state.page}
+                rowsPerPage={userSkillssSearch.state.rowsPerPage}
+                selected={userSkillssSelection.selected}
               />
             </Card>
           </Stack>
         </Container>
       </Box>
-      <SkillModal
+      <SkillMatrixModal
         onClose={handleTaskClose}
-        open={openSkillModal}
-        skillId={undefined}
-        onRefresh={() => skillsStore.handleRefresh()}
+        open={openUserSkillsModal}
+        userskillsId={undefined}
+        onRefresh={() => userSkillssStore.handleRefresh()}
       />
     </>
   );

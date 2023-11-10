@@ -18,6 +18,8 @@ import { UserListSearch } from './UserListSearch';
 import { UserListTable } from './UserListTable';
 import type { User } from 'src/types/user';
 import { UserModal } from './userModal/UserModal';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 interface Filters {
   query?: string;
@@ -100,12 +102,17 @@ const useUsersStore = (searchState: UsersSearchState) => {
 
   const handleUsersGet = useCallback(async () => {
     try {
-      const response = await authApi.getUsers(searchState);
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: 'http://localhost:8080/api/users',
+        headers: { 'x-access-token': accessToken },
+      });
 
       if (isMounted()) {
         setState({
-          users: response.data,
-          usersCount: response.count,
+          users: response.data.users,
+          usersCount: response.data.users.count,
         });
       }
     } catch (err) {
@@ -129,7 +136,7 @@ const useUsersStore = (searchState: UsersSearchState) => {
 
 const useUsersIds = (users: User[] = []) => {
   return useMemo(() => {
-    return users.map((customer) => customer.id);
+    return users.map((customer) => customer._id);
   }, [users]);
 };
 

@@ -121,12 +121,12 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
           </TableHead>
           <TableBody>
             {items.map((skill) => {
-              const isSelected = selected.includes(skill.id);
+              const isSelected = selected.includes(skill._id);
 
               return (
                 <TableRow
                   hover
-                  key={skill.id}
+                  key={skill._id}
                   selected={isSelected}
                 >
                   <TableCell padding="checkbox">
@@ -134,9 +134,9 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                       checked={isSelected}
                       onChange={(event: ChangeEvent<HTMLInputElement>): void => {
                         if (event.target.checked) {
-                          onSelectOne?.(skill.id);
+                          onSelectOne?.(skill._id);
                         } else {
-                          onDeselectOne?.(skill.id);
+                          onDeselectOne?.(skill._id);
                         }
                       }}
                       value={isSelected}

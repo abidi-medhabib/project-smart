@@ -97,7 +97,7 @@ class AuthApi {
         }
 
         // Create the access token
-        const accessToken = sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+        const accessToken = sign({ userId: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
         resolve({ accessToken });
       } catch (err) {
@@ -123,7 +123,7 @@ class AuthApi {
         }
 
         user = {
-          id: createResourceId(),
+          _id: createResourceId(),
           email,
           name,
           password,
@@ -132,39 +132,9 @@ class AuthApi {
 
         persistUser(user);
 
-        const accessToken = sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+        const accessToken = sign({ userId: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
         resolve({ accessToken });
-      } catch (err) {
-        console.error('[Auth Api]: ', err);
-        reject(new Error('Internal server error'));
-      }
-    });
-  }
-
-  me(request: MeRequest): MeResponse {
-    const { accessToken } = request;
-
-    return new Promise((resolve, reject) => {
-      try {
-        // Decode access token
-        const decodedToken = decode(accessToken) as any;
-
-        // Find the user
-        const { userId } = decodedToken;
-        const user = getPersistedUsers().find((user) => user.id === userId);
-
-        if (!user) {
-          reject(new Error('Invalid authorization token'));
-          return;
-        }
-
-        resolve({
-          id: user.id,
-          role: user.role,
-          email: user.email,
-          name: user.name,
-        });
       } catch (err) {
         console.error('[Auth Api]: ', err);
         reject(new Error('Internal server error'));

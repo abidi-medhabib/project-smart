@@ -9,7 +9,6 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
-import { projectsApi } from 'src/api/projects/projectApi';
 import { Seo } from 'src/components/seo';
 import { useMounted } from 'src/hooks/use-mounted';
 import { usePageView } from 'src/hooks/use-page-view';
@@ -18,6 +17,9 @@ import { ProjectListSearch } from './ProjectListSearch';
 import { ProjectListTable } from './ProjectsListTable';
 import type { Project } from 'src/types/project';
 import { ProjectModal } from './projectModal/ProjectModal';
+import { STORAGE_USER_KEY, TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
+import { User } from 'src/types/user';
 
 interface Filters {
   query?: string;
@@ -100,12 +102,17 @@ export const useProjectsStore = (searchState: ProjectsSearchState) => {
 
   const handleProjectsGet = useCallback(async () => {
     try {
-      const response = await projectsApi.getProjects(searchState);
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: 'http://localhost:8080/api/projects',
+        headers: { 'x-access-token': accessToken },
+      });
 
       if (isMounted()) {
         setState({
-          projects: response.data,
-          projectsCount: response.count,
+          projects: response.data.projects,
+          projectsCount: response.data.projects.length,
         });
       }
     } catch (err) {
@@ -129,7 +136,7 @@ export const useProjectsStore = (searchState: ProjectsSearchState) => {
 
 const useProjectsIds = (projects: Project[] = []) => {
   return useMemo(() => {
-    return projects.map((customer) => customer.id);
+    return projects.map((customer) => customer._id);
   }, [projects]);
 };
 
@@ -140,6 +147,17 @@ const Page = () => {
   const projectsSelection = useSelection<string>(projectsIds);
 
   const [openProjectModal, setOpenProjectModal] = useState<boolean>(false);
+  const userData = window.sessionStorage.getItem(STORAGE_USER_KEY);
+  const [role, setRole] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (userData) {
+      const user: User = JSON.parse(userData) as User;
+      if (user) {
+        setRole(user.role);
+      }
+    }
+  }, [userData]);
 
   const handleTaskOpen = useCallback((): void => {
     setOpenProjectModal(true);
@@ -171,23 +189,25 @@ const Page = () => {
               <Stack spacing={1}>
                 <Typography variant="h4">Projects</Typography>
               </Stack>
-              <Stack
-                alignItems="center"
-                direction="row"
-                spacing={3}
-              >
-                <Button
-                  startIcon={
-                    <SvgIcon>
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                  onClick={handleTaskOpen}
+              {role === 'Admin' && (
+                <Stack
+                  alignItems="center"
+                  direction="row"
+                  spacing={3}
                 >
-                  Add
-                </Button>
-              </Stack>
+                  <Button
+                    startIcon={
+                      <SvgIcon>
+                        <PlusIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                    onClick={handleTaskOpen}
+                  >
+                    Add
+                  </Button>
+                </Stack>
+              )}
             </Stack>
             <Card>
               <ProjectListSearch

@@ -14,6 +14,7 @@ const AnalyticsPage = lazy(() => import('src/pages/dashboard/analytics'));
 const KanbanPage = lazy(() => import('src/pages/dashboard/kanban'));
 const SkillPage = lazy(() => import('src/pages/skills/Skills'));
 const UsersPage = lazy(() => import('src/pages/users/Users'));
+const SkillMatrixPage = lazy(() => import('src/pages/skillMatrix/SkillMatrix'));
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -48,6 +49,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: 'users',
         element: <UsersPage />,
+      },
+      {
+        path: 'skills-matrix',
+        element: <SkillMatrixPage />,
       },
     ],
   },

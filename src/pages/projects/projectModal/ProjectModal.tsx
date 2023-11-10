@@ -1,14 +1,13 @@
 import { FC } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
+import { Button, FormHelperText, TextField } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import { Stack } from '@mui/system';
 
 import { useMounted } from 'src/hooks/use-mounted';
-import { authApi } from 'src/api/auth';
-import { createResourceId } from 'src/utils/create-resource-id';
-import { projectsApi } from 'src/api/projects/projectApi';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 interface ProjectValues {
   name: string;
@@ -42,11 +41,17 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
     validationSchema,
     onSubmit: async (values, helpers): Promise<void> => {
       try {
-        projectsApi.saveProject({
-          id: createResourceId(),
-          name: values.name,
-          description: values.description,
+        const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+        await axios({
+          method: 'post',
+          url: 'http://localhost:8080/api/projects',
+          headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+          data: {
+            name: values.name,
+            description: values.description,
+          },
         });
+
         if (onRefresh) {
           onRefresh();
         }
