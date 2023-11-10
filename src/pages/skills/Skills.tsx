@@ -155,7 +155,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Skill List" />
+      <Seo title="Skill List" />
       <Box
         component="main"
         sx={{

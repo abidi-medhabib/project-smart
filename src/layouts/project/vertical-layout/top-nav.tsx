@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, type FC, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Menu01Icon from '@untitled-ui/icons-react/build/esm/Menu01';
 import { alpha } from '@mui/system/colorManipulator';
@@ -15,6 +15,10 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { RouterLink } from 'src/components/router-link';
 import { paths } from 'src/paths';
+import { useProjectsStore } from 'src/pages/projects/Projects';
+import { useParams } from 'react-router-dom';
+import { useMounted } from 'src/hooks/use-mounted';
+import { projectsApi } from 'src/api/projects/projectApi';
 
 const TOP_NAV_HEIGHT = 64;
 const SIDE_NAV_WIDTH = 280;
@@ -26,6 +30,20 @@ interface TopNavProps {
 export const TopNav: FC<TopNavProps> = (props) => {
   const { onMobileNavOpen, ...other } = props;
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
+  const [projectName, setProjectName] = useState<string | undefined>();
+  const params = useParams();
+  //const projectsStore = useProjectsStore({ filters: {} });
+
+  useEffect(() => {
+    const getProjectName = async () => {
+      if (params.projectId) {
+        const response = await projectsApi.getProjects({ filters: {} });
+        setProjectName(response.data.find((p) => p.id === params.projectId)?.name);
+      }
+    };
+
+    getProjectName();
+  }, [params]);
 
   return (
     <Box
@@ -67,7 +85,11 @@ export const TopNav: FC<TopNavProps> = (props) => {
               </SvgIcon>
             </IconButton>
           )}
-            <div>
+          {projectName && (
+            <Stack
+              direction="row"
+              spacing={1}
+            >
               <Link
                 color="text.primary"
                 component={RouterLink}
@@ -80,7 +102,10 @@ export const TopNav: FC<TopNavProps> = (props) => {
               >
                 <Typography variant="subtitle2">Home</Typography>
               </Link>
-            </div>
+              <Typography variant="subtitle2">{`>`}</Typography>
+              <Typography variant="subtitle2">{projectName}</Typography>
+            </Stack>
+          )}
         </Stack>
         <Stack
           alignItems="center"

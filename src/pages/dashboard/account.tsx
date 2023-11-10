@@ -40,7 +40,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Account" />
+      <Seo title="Account" />
       <Box
         component="main"
         sx={{

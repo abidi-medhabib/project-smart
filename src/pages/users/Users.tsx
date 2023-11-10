@@ -153,7 +153,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: User List" />
+      <Seo title="User List" />
       <Box
         component="main"
         sx={{

@@ -9,7 +9,7 @@ interface SeoProps {
 export const Seo: FC<SeoProps> = (props) => {
   const { title } = props;
 
-  const fullTitle = title ? title + ' | Devias Kit PRO' : 'Devias Kit PRO';
+  const fullTitle = title ? title + ' | Smart assign' : 'Smart assign';
 
   return (
     <Helmet>

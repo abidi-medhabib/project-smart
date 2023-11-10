@@ -211,6 +211,12 @@ export const SideNav: FC<SideNavProps> = (props) => {
             >
               <Logo />
             </Box>
+            <Typography
+              color="inherit"
+              variant="h6"
+            >
+              Smart Assign
+            </Typography>
           </Stack>
           <Stack
             component="nav"

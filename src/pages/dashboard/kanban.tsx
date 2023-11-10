@@ -188,7 +188,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Kanban" />
+      <Seo title="Kanban" />
       <Box
         component="main"
         sx={{

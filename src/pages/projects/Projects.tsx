@@ -91,7 +91,7 @@ interface ProjectsStoreState {
   projectsCount: number;
 }
 
-const useProjectsStore = (searchState: ProjectsSearchState) => {
+export const useProjectsStore = (searchState: ProjectsSearchState) => {
   const isMounted = useMounted();
   const [state, setState] = useState<ProjectsStoreState>({
     projects: [],
@@ -153,7 +153,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Project List" />
+      <Seo title="Project List" />
       <Box
         component="main"
         sx={{

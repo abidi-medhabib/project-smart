@@ -24,7 +24,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Analytics" />
+      <Seo title="Analytics" />
       <Box
         component="main"
         sx={{

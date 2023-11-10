@@ -58,7 +58,7 @@ export const Layout: FC<LayoutProps> = (props) => {
             sx={{ mb: 1 }}
             variant="h4"
           >
-            Welcome to Devias Kit PRO
+            Welcome to Smart assign
           </Typography>
           <Typography
             color="text.secondary"
