@@ -1,9 +1,7 @@
 import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import MessageDotsCircleIcon from '@untitled-ui/icons-react/build/esm/MessageDotsCircle';
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
@@ -50,10 +48,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
   }
 
   const hasAssignees = task.assigneesIds.length > 0;
-  const hasAttachments = task.attachments.length > 0;
-  const hasChecklists = task.checklists.length > 0;
   const hasComments = task.comments.length > 0;
-  const hasLabels = task.labels.length > 0;
 
   return (
     <Card
@@ -80,26 +75,6 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(function TaskC
       {...other}
     >
       <Typography variant="subtitle1">{task.name}</Typography>
-      {hasLabels && (
-        <Box
-          sx={{
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'wrap',
-            m: -1,
-            mt: 1,
-          }}
-        >
-          {task.labels.map((label) => (
-            <Chip
-              key={label}
-              label={label}
-              size="small"
-              sx={{ m: 1 }}
-            />
-          ))}
-        </Box>
-      )}
       <Stack
         alignItems="center"
         direction="row"

@@ -195,7 +195,7 @@ class KanbanApi {
 
         // Create the new column
         const column: Column = {
-          id: createResourceId(),
+          _id: createResourceId(),
           name,
           taskIds: [],
         };
@@ -222,7 +222,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to clear
-        const column = clonedBoard.columns.find((column) => column.id === columnId);
+        const column = clonedBoard.columns.find((column) => column._id === columnId);
 
         if (!column) {
           reject(new Error('Column not found'));
@@ -252,7 +252,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to clear
-        const column = clonedBoard.columns.find((column) => column.id === columnId);
+        const column = clonedBoard.columns.find((column) => column._id === columnId);
 
         if (!column) {
           reject(new Error('Column not found'));
@@ -285,7 +285,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column to remove
-        const column = clonedBoard.columns.find((column) => column.id === columnId);
+        const column = clonedBoard.columns.find((column) => column._id === columnId);
 
         if (!column) {
           reject(new Error('Column not found'));
@@ -296,7 +296,7 @@ class KanbanApi {
         clonedBoard.tasks = clonedBoard.tasks.filter((task) => task.columnId !== columnId);
 
         // Remove the column from the board
-        clonedBoard.columns = clonedBoard.columns.filter((column) => column.id !== columnId);
+        clonedBoard.columns = clonedBoard.columns.filter((column) => column._id !== columnId);
 
         // Save changes
         persistBoard(request.projectId, clonedBoard);
@@ -318,7 +318,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the column where the new task will be added
-        const column = clonedBoard.columns.find((column) => column.id === columnId);
+        const column = clonedBoard.columns.find((column) => column._id === columnId);
 
         if (!column) {
           reject(new Error('Column not found'));
@@ -327,7 +327,7 @@ class KanbanApi {
 
         // Create the new task
         const task: Task = {
-          id: createResourceId(),
+          _id: createResourceId(),
           assigneesIds: [],
           attachments: [],
           authorId: user.id,
@@ -345,7 +345,7 @@ class KanbanApi {
         clonedBoard.tasks.push(task);
 
         // Add the taskId reference to the column
-        column.taskIds.push(task.id);
+        column.taskIds.push(task._id);
 
         // Save changes
         persistBoard(request.projectId, clonedBoard);
@@ -367,7 +367,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be updated
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -397,7 +397,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be moved
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -405,7 +405,7 @@ class KanbanApi {
         }
 
         // Find the source column of the task
-        const sourceColumn = clonedBoard.columns.find((column) => column.id === task.columnId);
+        const sourceColumn = clonedBoard.columns.find((column) => column._id === task.columnId);
 
         if (!sourceColumn) {
           reject(new Error('Column not found'));
@@ -417,10 +417,10 @@ class KanbanApi {
 
         if (!columnId) {
           // If columnId is not provided, it means that we move the task in the same list
-          sourceColumn.taskIds.splice(position, 0, task.id);
+          sourceColumn.taskIds.splice(position, 0, task._id);
         } else {
           // Find the destination column for the task
-          const destinationColumn = clonedBoard.columns.find((column) => column.id === columnId);
+          const destinationColumn = clonedBoard.columns.find((column) => column._id === columnId);
 
           if (!destinationColumn) {
             reject(new Error('Column not found'));
@@ -428,10 +428,10 @@ class KanbanApi {
           }
 
           // Add the taskId reference to the destination list
-          destinationColumn.taskIds.splice(position, 0, task.id);
+          destinationColumn.taskIds.splice(position, 0, task._id);
 
           // Store the new columnId reference
-          task.columnId = destinationColumn.id;
+          task.columnId = destinationColumn._id;
         }
 
         // Save changes
@@ -454,7 +454,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that will be removed
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -462,10 +462,10 @@ class KanbanApi {
         }
 
         // Remove the task from board
-        clonedBoard.tasks = clonedBoard.tasks.filter((task) => task.id !== taskId);
+        clonedBoard.tasks = clonedBoard.tasks.filter((task) => task._id !== taskId);
 
         // Find the column using the columnId reference
-        const column = clonedBoard.columns.find((column) => column.id === task.columnId);
+        const column = clonedBoard.columns.find((column) => column._id === task.columnId);
 
         // If for some reason it does not exist, there's no problem. Maybe something broke before.
         if (column) {
@@ -492,7 +492,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the comment will be added
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -530,7 +530,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -567,7 +567,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that will be updated
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -605,7 +605,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that will be removed
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -635,7 +635,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -680,7 +680,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task where the checklist will be added
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));
@@ -726,7 +726,7 @@ class KanbanApi {
         const clonedBoard: Board = deepCopy(getPersistedBoard(request.projectId));
 
         // Find the task that contains the checklist that contains the check item that will be removed
-        const task = clonedBoard.tasks.find((task) => task.id === taskId);
+        const task = clonedBoard.tasks.find((task) => task._id === taskId);
 
         if (!task) {
           reject(new Error('Task not found'));

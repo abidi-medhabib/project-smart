@@ -83,6 +83,13 @@ const createTask =
   (params: CreateTaskParams): AppThunk =>
   async (dispatch): Promise<void> => {
     const response = await kanbanApi.createTask(params);
+    // const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    // const response = await axios({
+    //   method: 'post',
+    //   url: 'http://localhost:8080/api/board/tasks',
+    //   headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+    //   data: params,
+    // });
 
     dispatch(slice.actions.createTask(response));
   };

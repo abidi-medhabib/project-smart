@@ -84,24 +84,24 @@ const reducers = {
   getBoard(state: KanbanState, action: GetBoardAction): void {
     const board = action.payload;
 
-    state.columns.byId = objFromArray(board.columns);
+    state.columns.byId = objFromArray(board.columns, '_id');
     state.columns.allIds = Object.keys(state.columns.byId);
-    state.tasks.byId = objFromArray(board.tasks);
+    state.tasks.byId = objFromArray(board.tasks, '_id');
     state.tasks.allIds = Object.keys(state.tasks.byId);
-    state.members.byId = objFromArray(board.members);
+    state.members.byId = objFromArray(board.members, '_id');
     state.members.allIds = Object.keys(state.members.byId);
     state.isLoaded = true;
   },
   createColumn(state: KanbanState, action: CreateColumnAction): void {
     const column = action.payload;
 
-    state.columns.byId[column.id] = column;
-    state.columns.allIds.push(column.id);
+    state.columns.byId[column._id] = column;
+    state.columns.allIds.push(column._id);
   },
   updateColumn(state: KanbanState, action: UpdateColumnAction): void {
     const column = action.payload;
 
-    state.columns.byId[column.id] = column;
+    state.columns.byId[column._id] = column;
   },
   clearColumn(state: KanbanState, action: ClearColumnAction): void {
     const columnId = action.payload;
@@ -128,16 +128,16 @@ const reducers = {
   createTask(state: KanbanState, action: CreateTaskAction): void {
     const task = action.payload;
 
-    state.tasks.byId[task.id] = task;
-    state.tasks.allIds.push(task.id);
+    state.tasks.byId[task._id] = task;
+    state.tasks.allIds.push(task._id);
 
     // Add the taskId reference to the column
-    state.columns.byId[task.columnId].taskIds.push(task.id);
+    state.columns.byId[task.columnId].taskIds.push(task._id);
   },
   updateTask(state: KanbanState, action: UpdateTaskAction): void {
     const task = action.payload;
 
-    Object.assign(state.tasks.byId[task.id], task);
+    Object.assign(state.tasks.byId[task._id], task);
   },
   moveTask(state: KanbanState, action: MoveTaskAction): void {
     const { taskId, position, columnId } = action.payload;

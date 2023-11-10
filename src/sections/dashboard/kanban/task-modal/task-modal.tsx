@@ -144,7 +144,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.moveTask({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             position: 0,
             columnId,
           })
@@ -163,7 +163,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       await dispatch(
         thunks.deleteTask({
           projectId: projectId,
-          taskId: task!.id,
+          taskId: task!._id,
         })
       );
       onClose?.();
@@ -179,7 +179,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateTask({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             update: {
               name,
             },
@@ -228,7 +228,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
           await dispatch(
             thunks.updateTask({
               projectId: projectId,
-              taskId: task!.id,
+              taskId: task!._id,
               update: {
                 description,
               },
@@ -252,7 +252,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
           await dispatch(
             thunks.updateTask({
               projectId: projectId,
-              taskId: task!.id,
+              taskId: task!._id,
               update: {
                 assigneesIds: [...task!.assigneesIds, assigneeId],
               },
@@ -278,7 +278,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       await dispatch(
         thunks.updateTask({
           projectId: projectId,
-          taskId: task!.id,
+          taskId: task!._id,
           update: { isSubscribed: true },
         })
       );
@@ -293,7 +293,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       await dispatch(
         thunks.updateTask({
           projectId: projectId,
-          taskId: task!.id,
+          taskId: task!._id,
           update: { isSubscribed: false },
         })
       );
@@ -309,7 +309,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateTask({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             update: {
               labels,
             },
@@ -328,7 +328,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
       await dispatch(
         thunks.addChecklist({
           projectId: projectId,
-          taskId: task!.id,
+          taskId: task!._id,
           name: 'Untitled Checklist',
         })
       );
@@ -344,7 +344,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateChecklist({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             update: { name },
           })
@@ -363,7 +363,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.deleteChecklist({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
           })
         );
@@ -381,7 +381,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.addCheckItem({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             name,
           })
@@ -400,7 +400,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.deleteCheckItem({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             checkItemId,
           })
@@ -419,7 +419,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateCheckItem({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             checkItemId,
             update: {
@@ -441,7 +441,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateCheckItem({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             checkItemId,
             update: {
@@ -463,7 +463,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.updateCheckItem({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             checklistId,
             checkItemId,
             update: {
@@ -485,7 +485,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         await dispatch(
           thunks.addComment({
             projectId: projectId,
-            taskId: task!.id,
+            taskId: task!._id,
             message,
           })
         );
@@ -501,7 +501,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
     return columns.map((column) => {
       return {
         label: column.name,
-        value: column.id,
+        value: column._id,
       };
     });
   }, [columns]);
@@ -547,7 +547,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             <TaskStatus
               onChange={(columnId) => handleMove(columnId)}
               options={statusOptions}
-              value={column.id}
+              value={column._id}
             />
           </div>
           {/* <Stack

@@ -8,17 +8,17 @@ const board: Board = {
   members: [],
   columns: [
     {
-      id: '5e849c39325dc5ef58e5a5db',
+      _id: '5e849c39325dc5ef58e5a5db',
       taskIds: [],
       name: 'Todo',
     },
     {
-      id: '5e849c2b38d238c33e516755',
+      _id: '5e849c2b38d238c33e516755',
       taskIds: [],
       name: 'Progress',
     },
     {
-      id: '5e849c2b38d238c33e5146755',
+      _id: '5e849c2b38d238c33e5146755',
       taskIds: [],
       name: 'Done',
     },

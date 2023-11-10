@@ -24,7 +24,7 @@ export interface Comment {
 }
 
 export interface Task {
-  id: string;
+  _id: string;
   assigneesIds: string[];
   attachments: Attachment[];
   authorId: string;
@@ -39,7 +39,7 @@ export interface Task {
 }
 
 export interface Column {
-  id: string;
+  _id: string;
   taskIds: string[];
   name: string;
 }
