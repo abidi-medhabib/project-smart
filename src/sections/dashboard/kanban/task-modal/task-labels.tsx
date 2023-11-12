@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
 import Chip from '@mui/material/Chip';
@@ -10,6 +10,9 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 
 import { usePopover } from 'src/hooks/use-popover';
+import { Skill } from 'src/types/skill';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 const options: string[] = ['Business', 'Planning', 'Frontend', 'Design'];
 
@@ -22,9 +25,24 @@ export const TaskLabels: FC<TaskLabelsProps> = (props) => {
   const { labels = [], onChange } = props;
   const popover = usePopover<HTMLButtonElement>();
 
+  const [skills, setSkills] = useState<Skill[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: 'http://localhost:8080/api/skills',
+        headers: { 'x-access-token': accessToken },
+      });
+      setSkills(response.data.skills);
+    };
+
+    fetchData();
+  }, []);
+
   const availableOptions = useMemo(() => {
-    return options.filter((option) => !labels.includes(option));
-  }, [labels]);
+    return skills.filter((option) => !labels.includes(option.label));
+  }, [skills, labels]);
 
   const handleDelete = useCallback(
     (label: string) => {
@@ -96,10 +114,10 @@ export const TaskLabels: FC<TaskLabelsProps> = (props) => {
       >
         {availableOptions.map((option) => (
           <MenuItem
-            key={option}
-            onClick={() => handleToggle(option)}
+            key={option.label}
+            onClick={() => handleToggle(option.label)}
           >
-            {option}
+            {option.label}
           </MenuItem>
         ))}
       </Menu>

@@ -26,7 +26,7 @@ export const TaskComment: FC<TaskCommentProps> = (props) => {
   const author = useAuthor(comment.authorId);
 
   const avatar = author?.avatar || undefined;
-  const createdAt = format(comment.createdAt, "MMM dd, yyyy 'at' hh:mm a");
+  const createdAt = format(new Date(comment.createdAt), "MMM dd, yyyy 'at' hh:mm a");
 
   return (
     <Stack

@@ -1,10 +1,8 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import debounce from 'lodash.debounce';
-import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
@@ -28,7 +26,10 @@ import { TaskCommentAdd } from './task-comment-add';
 import { TaskStatus } from './task-status';
 import { authApi } from 'src/api/auth';
 import { User } from 'src/types/user';
-import { TextField, MenuItem } from '@mui/material';
+import { TextField, MenuItem, Avatar, AvatarGroup } from '@mui/material';
+import { TaskLabels } from './task-labels';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -515,8 +516,15 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await authApi.getUsers({});
-      setUsers(response.data.filter((u) => u.role === 'Developper'));
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: 'http://localhost:8080/api/users',
+        headers: { 'x-access-token': accessToken },
+      });
+
+      //const response = await authApi.getUsers({});
+      setUsers(response.data.users.filter((u: User) => u.role === 'Developper'));
     };
 
     fetchData();
@@ -550,38 +558,6 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               value={column._id}
             />
           </div>
-          {/* <Stack
-            justifyContent="flex-end"
-            alignItems="center"
-            direction="row"
-            spacing={1}
-          >
-            {task.isSubscribed ? (
-              <IconButton onClick={handleUnsubscribe}>
-                <SvgIcon>
-                  <EyeOffIcon />
-                </SvgIcon>
-              </IconButton>
-            ) : (
-              <IconButton onClick={handleSubscribe}>
-                <SvgIcon>
-                  <EyeIcon />
-                </SvgIcon>
-              </IconButton>
-            )}
-            <IconButton onClick={handleDelete}>
-              <SvgIcon>
-                <ArchiveIcon />
-              </SvgIcon>
-            </IconButton>
-            {!mdUp && (
-              <IconButton onClick={onClose}>
-                <SvgIcon>
-                  <XIcon />
-                </SvgIcon>
-              </IconButton>
-            )}
-          </Stack> */}
         </Stack>
         <Box sx={{ px: 1 }}>
           <Input
@@ -619,6 +595,10 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
             label="Overview"
           />
           <Tab
+            value="assignments"
+            label="Assignments"
+          />
+          <Tab
             value="comments"
             label="Comments"
           />
@@ -630,7 +610,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               container
               spacing={3}
             >
-              {/* <Grid
+              <Grid
                 xs={12}
                 sm={4}
               >
@@ -638,18 +618,60 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   color="text.secondary"
                   variant="caption"
                 >
-                  Created by
+                  Required Skills
                 </Typography>
               </Grid>
               <Grid
                 xs={12}
                 sm={8}
               >
-                {author && <Avatar src={author.avatar || undefined} />}
-              </Grid> */}
+                <TaskLabels
+                  labels={task.labels}
+                  onChange={handleLabelsChange}
+                />
+              </Grid>
               <Grid
                 xs={12}
-                sm={4}
+                sm={12}
+              >
+                <Typography
+                  color="text.secondary"
+                  variant="caption"
+                >
+                  Description
+                </Typography>
+              </Grid>
+              <Grid
+                xs={12}
+                sm={12}
+              >
+                <Input
+                  defaultValue={task.description}
+                  fullWidth
+                  multiline
+                  disableUnderline
+                  onChange={handleDescriptionChange}
+                  placeholder="Task description"
+                  rows={6}
+                  sx={{
+                    borderColor: 'ActiveBorder',
+                    borderRadius: 1,
+                    borderStyle: 'solid',
+                    borderWidth: 1,
+                    p: 1,
+                  }}
+                />
+              </Grid>
+            </Grid>
+          )}
+          {currentTab === 'assignments' && (
+            <Grid
+              container
+              spacing={3}
+            >
+              <Grid
+                xs={12}
+                sm={12}
               >
                 <Typography
                   color="text.secondary"
@@ -660,7 +682,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
               </Grid>
               <Grid
                 xs={12}
-                sm={8}
+                sm={12}
               >
                 <Stack
                   alignItems="center"
@@ -670,7 +692,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                 >
                   <TextField
                     fullWidth
-                    label="Role"
+                    label="select a developper"
                     name="role"
                     onChange={assignToUser}
                     select
@@ -697,129 +719,25 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                   flexWrap="wrap"
                   spacing={2}
                 >
-                  {assignees.map((assignee: any) => (
-                    <Typography
-                      variant="caption"
-                      key={assignee.id}
-                    >
-                      {assignee.name}
-                    </Typography>
-                  ))}
+                  <Stack
+                    direction="column"
+                    alignContent="end"
+                    spacing={5}
+                  >
+                    {assignees.map((assignee) => (
+                      <Stack
+                        key={assignee!._id}
+                        direction="row"
+                        justifyContent="start"
+                        spacing={2}
+                      >
+                        <Avatar src={assignee!.avatar || undefined} />
+                        <Typography variant="subtitle2">{assignee?.name}</Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
                 </Stack>
               </Grid>
-              {/* <Grid
-                xs={12}
-                sm={4}
-              >
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                >
-                  Attachments
-                </Typography>
-              </Grid> */}
-              {/* <Grid
-                xs={12}
-                sm={8}
-              >
-                <Stack
-                  alignItems="center"
-                  direction="row"
-                  flexWrap="wrap"
-                  spacing={1}
-                >
-                  {task.attachments.map((attachment) => (
-                    <Avatar
-                      key={attachment.id}
-                      src={attachment.url || undefined}
-                      sx={{
-                        height: 64,
-                        width: 64,
-                      }}
-                      variant="rounded"
-                    />
-                  ))}
-                  <IconButton disabled>
-                    <SvgIcon fontSize="small">
-                      <PlusIcon />
-                    </SvgIcon>
-                  </IconButton>
-                </Stack>
-              </Grid> */}
-              {/* <Grid
-                xs={12}
-                sm={4}
-              >
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                >
-                  Due date
-                </Typography>
-              </Grid> */}
-              {/* <Grid
-                xs={12}
-                sm={8}
-              >
-                {task.due && (
-                  <Chip
-                    size="small"
-                    label={format(task.due, 'MMM dd, yyyy')}
-                  />
-                )}
-              </Grid>
-              <Grid
-                xs={12}
-                sm={4}
-              >
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                >
-                  Labels
-                </Typography>
-              </Grid> */}
-              {/* <Grid
-                xs={12}
-                sm={8}
-              >
-                <TaskLabels
-                  labels={task.labels}
-                  onChange={handleLabelsChange}
-                />
-              </Grid>
-              <Grid
-                xs={12}
-                sm={4}
-              >
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                >
-                  Description
-                </Typography>
-              </Grid> */}
-              {/* <Grid
-                xs={12}
-                sm={8}
-              >
-                <Input
-                  defaultValue={task.description}
-                  fullWidth
-                  multiline
-                  disableUnderline
-                  onChange={handleDescriptionChange}
-                  placeholder="Leave a message"
-                  rows={6}
-                  sx={{
-                    borderColor: 'divider',
-                    borderRadius: 1,
-                    borderStyle: 'solid',
-                    borderWidth: 1,
-                    p: 1,
-                  }}
-                />
-              </Grid> */}
             </Grid>
           )}
 

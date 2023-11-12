@@ -7,15 +7,15 @@ import type { AppThunk } from 'src/store';
 const getBoard =
   (projectId: string): AppThunk =>
   async (dispatch): Promise<void> => {
-    const data = await kanbanApi.getBoard({ projectId });
-    // const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
-    // const response = await axios({
-    //   method: 'get',
-    //   url: `http://localhost:8080/api/board/${projectId}`,
-    //   headers: { 'x-access-token': accessToken },
-    // });
+    //const data = await kanbanApi.getBoard({ projectId });
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const response = await axios({
+      method: 'get',
+      url: `http://localhost:8080/api/board/${projectId}`,
+      headers: { 'x-access-token': accessToken },
+    });
 
-    dispatch(slice.actions.getBoard(data));
+    dispatch(slice.actions.getBoard(response.data.board));
   };
 
 type CreateColumnParams = {
@@ -82,16 +82,16 @@ type CreateTaskParams = {
 const createTask =
   (params: CreateTaskParams): AppThunk =>
   async (dispatch): Promise<void> => {
-    const response = await kanbanApi.createTask(params);
-    // const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
-    // const response = await axios({
-    //   method: 'post',
-    //   url: 'http://localhost:8080/api/board/tasks',
-    //   headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
-    //   data: params,
-    // });
+    //const response = await kanbanApi.createTask(params);
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const response = await axios({
+      method: 'post',
+      url: 'http://localhost:8080/api/board/tasks',
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+      data: params,
+    });
 
-    dispatch(slice.actions.createTask(response));
+    dispatch(slice.actions.createTask(response.data));
   };
 
 type UpdateTaskParams = {
@@ -109,9 +109,16 @@ type UpdateTaskParams = {
 const updateTask =
   (params: UpdateTaskParams): AppThunk =>
   async (dispatch): Promise<void> => {
-    const response = await kanbanApi.updateTask(params);
+    // const response = await kanbanApi.updateTask(params);
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const response = await axios({
+      method: 'put',
+      url: 'http://localhost:8080/api/board/tasks',
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+      data: params,
+    });
 
-    dispatch(slice.actions.updateTask(response));
+    dispatch(slice.actions.updateTask(response.data));
   };
 
 type MoveTaskParams = {
@@ -124,7 +131,14 @@ type MoveTaskParams = {
 const moveTask =
   (params: MoveTaskParams): AppThunk =>
   async (dispatch): Promise<void> => {
-    await kanbanApi.moveTask(params);
+    // await kanbanApi.moveTask(params);
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const response = await axios({
+      method: 'post',
+      url: 'http://localhost:8080/api/board/tasks/move',
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+      data: params,
+    });
 
     dispatch(slice.actions.moveTask(params));
   };
@@ -151,12 +165,19 @@ type AddCommentParams = {
 const addComment =
   (params: AddCommentParams): AppThunk =>
   async (dispatch): Promise<void> => {
-    const response = await kanbanApi.addComment(params);
+    // const response = await kanbanApi.addComment(params);
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    const response = await axios({
+      method: 'post',
+      url: 'http://localhost:8080/api/board/tasks/comment',
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+      data: params,
+    });
 
     dispatch(
       slice.actions.addComment({
         taskId: params.taskId,
-        comment: response,
+        comment: response.data,
       })
     );
   };

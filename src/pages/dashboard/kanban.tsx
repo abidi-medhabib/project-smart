@@ -42,6 +42,7 @@ const Page = () => {
   const dispatch = useDispatch();
   const columnsIds = useColumnsIds();
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
+  const [openTaskModal, setOpenTaskModal] = useState<boolean>(false);
 
   usePageView();
 
@@ -179,10 +180,12 @@ const Page = () => {
   );
 
   const handleTaskOpen = useCallback((taskId: string): void => {
+    setOpenTaskModal(true);
     setCurrentTaskId(taskId);
   }, []);
 
   const handleTaskClose = useCallback((): void => {
+    setOpenTaskModal(false);
     setCurrentTaskId(null);
   }, []);
 
@@ -234,12 +237,14 @@ const Page = () => {
           </Box>
         </DragDropContext>
       </Box>
-      <TaskModal
-        onClose={handleTaskClose}
-        open={!!currentTaskId}
-        taskId={currentTaskId || undefined}
-        projectId={params.projectId!}
-      />
+      {openTaskModal && (
+        <TaskModal
+          onClose={handleTaskClose}
+          open={openTaskModal}
+          taskId={currentTaskId || undefined}
+          projectId={params.projectId!}
+        />
+      )}
     </>
   );
 };
