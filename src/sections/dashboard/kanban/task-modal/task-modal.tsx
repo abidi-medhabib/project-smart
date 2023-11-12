@@ -30,6 +30,7 @@ import { TextField, MenuItem, Avatar, AvatarGroup } from '@mui/material';
 import { TaskLabels } from './task-labels';
 import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
 import axios from 'axios';
+import { UserSkills } from 'src/types/userSkills';
 
 const useColumns = (): Column[] => {
   return useSelector((state) => {
@@ -508,6 +509,7 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
   }, [columns]);
 
   const [users, setUsers] = useState<User[]>([]);
+  const [userSkills, setUserSkills] = useState<UserSkills[]>([]);
   const assignees = task
     ? task.assigneesIds
         .map((assigneeId: string) => users.find((u) => u._id === assigneeId))
@@ -523,8 +525,14 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
         headers: { 'x-access-token': accessToken },
       });
 
-      //const response = await authApi.getUsers({});
+      const userSkillsResponse = await axios({
+        method: 'get',
+        url: 'http://localhost:8080/api/user-skills',
+        headers: { 'x-access-token': accessToken },
+      });
+
       setUsers(response.data.users.filter((u: User) => u.role === 'Developper'));
+      setUserSkills(userSkillsResponse.data.userSkills);
     };
 
     fetchData();
@@ -703,7 +711,11 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                         key={user._id}
                         value={user._id}
                       >
-                        {user.name}
+                        {`${user.name} (${
+                          userSkills.filter(
+                            (s) => s.email === user.email && task.labels.includes(s.skill)
+                          ).length
+                        } matching skills)`}
                       </MenuItem>
                     ))}
                   </TextField>

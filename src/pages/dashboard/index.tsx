@@ -13,7 +13,11 @@ import { OverviewOpenTickets } from 'src/sections/dashboard/overview/overview-op
 import { t } from 'i18next';
 import { tokens } from 'src/locales/tokens';
 import { useSelector } from 'src/store';
-import type { Column } from 'src/types/kanban';
+import type { Board, Column } from 'src/types/kanban';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const useColumn = (columnId: string): Column | undefined => {
   return useSelector((state) => {
@@ -25,6 +29,8 @@ const useColumn = (columnId: string): Column | undefined => {
 
 const Page = () => {
   const settings = useSettings();
+  const params = useParams();
+  const [board, setBoard] = useState<Board | undefined>();
 
   usePageView();
 
@@ -32,57 +38,91 @@ const Page = () => {
   const progressColumn = useColumn('5e849c2b38d238c33e516755');
   const doneColumn = useColumn('5e849c2b38d238c33e5146755');
 
+  useEffect(() => {
+    const getBoard = async () => {
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: `http://localhost:8080/api/board/${params.projectId}`,
+        headers: { 'x-access-token': accessToken },
+      });
+      setBoard(response.data.board);
+    };
+
+    getBoard();
+  }, [params]);
+
   return (
     <>
       <Seo title="Overview" />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8,
-        }}
-      >
-        <Container maxWidth={settings.stretch ? false : 'xl'}>
-          <Grid
-            container
-            disableEqualOverflow
-            spacing={{
-              xs: 3,
-              lg: 4,
-            }}
-          >
-            <Grid xs={12}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                spacing={4}
+      {board && (
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            py: 8,
+          }}
+        >
+          <Container maxWidth={settings.stretch ? false : 'xl'}>
+            <Grid
+              container
+              disableEqualOverflow
+              spacing={{
+                xs: 3,
+                lg: 4,
+              }}
+            >
+              <Grid xs={12}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  spacing={4}
+                >
+                  <div>
+                    <Typography variant="h4">{t(tokens.nav.overview)}</Typography>
+                  </div>
+                </Stack>
+              </Grid>
+              <Grid
+                xs={12}
+                md={4}
               >
-                <div>
-                  <Typography variant="h4">{t(tokens.nav.overview)}</Typography>
-                </div>
-              </Stack>
+                <OverviewDoneTasks
+                  amount={
+                    board.tasks.filter(
+                      (t) => t.columnId === board.columns.find((c) => c.name === 'Done')?._id
+                    )?.length || 0
+                  }
+                />
+              </Grid>
+              <Grid
+                xs={12}
+                md={4}
+              >
+                <OverviewPendingIssues
+                  amount={
+                    board.tasks.filter(
+                      (t) => t.columnId === board.columns.find((c) => c.name === 'Progress')?._id
+                    )?.length || 0
+                  }
+                />
+              </Grid>
+              <Grid
+                xs={12}
+                md={4}
+              >
+                <OverviewOpenTickets
+                  amount={
+                    board.tasks.filter(
+                      (t) => t.columnId === board.columns.find((c) => c.name === 'Todo')?._id
+                    )?.length || 0
+                  }
+                />
+              </Grid>
             </Grid>
-            <Grid
-              xs={12}
-              md={4}
-            >
-              <OverviewDoneTasks amount={doneColumn?.taskIds.length || 0} />
-            </Grid>
-            <Grid
-              xs={12}
-              md={4}
-            >
-              <OverviewPendingIssues amount={progressColumn?.taskIds.length || 0} />
-            </Grid>
-            <Grid
-              xs={12}
-              md={4}
-            >
-              <OverviewOpenTickets amount={todoColumn?.taskIds.length || 0} />
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+          </Container>
+        </Box>
+      )}
     </>
   );
 };
