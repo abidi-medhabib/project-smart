@@ -1,7 +1,8 @@
-import type { ChangeEvent, FC, MouseEvent } from 'react';
+import { useCallback, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
+import Delete from '@untitled-ui/icons-react/build/esm/Delete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -20,6 +21,8 @@ import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
 import type { Project } from 'src/types/project';
 import { paths } from 'src/paths';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import axios from 'axios';
 
 interface ProjectListTableProps {
   count?: number;
@@ -30,6 +33,8 @@ interface ProjectListTableProps {
   onRowsPerPageChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   onSelectAll?: () => void;
   onSelectOne?: (projectId: string) => void;
+  onEditProject: (project: Project) => void;
+  onRefresh: () => void;
   page?: number;
   rowsPerPage?: number;
   selected?: string[];
@@ -45,6 +50,8 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
     onRowsPerPageChange,
     onSelectAll,
     onSelectOne,
+    onEditProject,
+    onRefresh,
     page = 0,
     rowsPerPage = 0,
     selected = [],
@@ -53,6 +60,16 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
   const enableBulkActions = selected.length > 0;
+
+  const deleteProject = useCallback(async (project: Project) => {
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    await axios({
+      method: 'delete',
+      url: `http://localhost:8080/api/projects/${project._id}`,
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+    });
+    onRefresh();
+  }, []);
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -158,14 +175,16 @@ export const ProjectListTable: FC<ProjectListTableProps> = (props) => {
                     </Stack>
                   </TableCell>
                   <TableCell align="right">
-                    {/* <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.projects.edit}
-                    >
+                    <IconButton onClick={() => onEditProject(project)}>
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
-                    </IconButton> */}
+                    </IconButton>
+                    <IconButton onClick={() => deleteProject(project)}>
+                      <SvgIcon>
+                        <Delete />
+                      </SvgIcon>
+                    </IconButton>
                     <IconButton
                       component={RouterLink}
                       href={paths.projects.index.replace(':projectId', project._id.toString())}

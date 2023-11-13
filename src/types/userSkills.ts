@@ -5,5 +5,5 @@ export interface UserSkills {
   email: string;
   name: string;
   skill: string;
-  level: string;
+  level: number;
 }

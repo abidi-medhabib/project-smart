@@ -1,23 +1,33 @@
-import { FC } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { Button, FormHelperText, TextField } from '@mui/material';
+import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import { Stack } from '@mui/system';
 
 import { useMounted } from 'src/hooks/use-mounted';
 import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
 import axios from 'axios';
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers';
+import { Project } from 'src/types/project';
 
 interface ProjectValues {
   name: string;
   description: string;
+  client: string;
+  category: string;
+  startDate: Date | null;
+  endDate: Date | null;
   submit: null;
 }
 
 const initialValues: ProjectValues = {
   name: '',
   description: '',
+  client: '',
+  category: '',
+  startDate: null,
+  endDate: null,
   submit: null,
 };
 
@@ -29,11 +39,11 @@ interface ProjectModalProps {
   onClose: () => void;
   onRefresh?: () => void;
   open: boolean;
-  projectId?: string;
+  project: Project | null;
 }
 
 export const ProjectModal: FC<ProjectModalProps> = (props) => {
-  const { projectId, onClose, onRefresh, open = false, ...other } = props;
+  const { project, onClose, onRefresh, open = false, ...other } = props;
   const isMounted = useMounted();
 
   const formik = useFormik({
@@ -49,6 +59,11 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
           data: {
             name: values.name,
             description: values.description,
+            client: values.client,
+            category: values.category,
+            startDate: values.startDate,
+            endDate: values.endDate,
+            _id: project?._id,
           },
         });
 
@@ -68,6 +83,60 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
       }
     },
   });
+
+  useEffect(() => {
+    if (project) {
+      formik.resetForm({
+        values: {
+          category: project.category,
+          client: project.client,
+          description: project.description,
+          endDate: project.endDate ? new Date(project.endDate) : null,
+          name: project.name,
+          startDate: project.startDate ? new Date(project.startDate) : null,
+          submit: null,
+        },
+      });
+    }
+  }, [project]);
+
+  const handleStartDateChange = useCallback(
+    (date: Date | null): void => {
+      formik.setFieldValue('startDate', date);
+
+      // Prevent end date to be before start date
+      if (formik.values.endDate && date && date > formik.values.endDate) {
+        formik.setFieldValue('endDate', date);
+      }
+    },
+    [formik]
+  );
+
+  const handleClientChange = useCallback(
+    (value: string): void => {
+      formik.setFieldValue('client', value);
+    },
+    [formik]
+  );
+
+  const handleCategoryChange = useCallback(
+    (value: string): void => {
+      formik.setFieldValue('category', value);
+    },
+    [formik]
+  );
+
+  const handleEndDateChange = useCallback(
+    (date: Date | null): void => {
+      formik.setFieldValue('endDate', date);
+
+      // Prevent start date to be after end date
+      if (formik.values.startDate && date && date < formik.values.startDate) {
+        formik.setFieldValue('startDate', date);
+      }
+    },
+    [formik]
+  );
 
   return (
     <Drawer
@@ -145,8 +214,57 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
                   value={formik.values.description}
                   autoComplete="no"
                   multiline
-                  maxRows={6}
-                  style={{ height: 150 }}
+                  rows={6}
+                />
+                <TextField
+                  fullWidth
+                  label="select a client"
+                  name="client"
+                  value={formik.values.client}
+                  onBlur={formik.handleBlur}
+                  onChange={(v) => handleClientChange(v.target.value)}
+                  select
+                  autoComplete="no"
+                >
+                  <MenuItem
+                    value=""
+                    style={{ height: 40 }}
+                  ></MenuItem>
+                  <MenuItem value="Client 1">Client 1</MenuItem>
+                  <MenuItem value="Client 1">Client 2</MenuItem>
+                  <MenuItem value="Client 1">Client 3</MenuItem>
+                  <MenuItem value="Client 1">Client 4</MenuItem>
+                </TextField>
+                <TextField
+                  fullWidth
+                  label="select a category"
+                  name="category"
+                  onBlur={formik.handleBlur}
+                  onChange={(v) => handleCategoryChange(v.target.value)}
+                  select
+                  autoComplete="no"
+                  value={formik.values.category}
+                >
+                  <MenuItem
+                    value=""
+                    style={{ height: 40 }}
+                  ></MenuItem>
+                  <MenuItem value="Category 1">Category 1</MenuItem>
+                  <MenuItem value="Category 1">Category 2</MenuItem>
+                  <MenuItem value="Category 1">Category 3</MenuItem>
+                  <MenuItem value="Category 1">Category 4</MenuItem>
+                </TextField>
+                <DatePicker
+                  label="Start date"
+                  onChange={handleStartDateChange}
+                  value={formik.values.startDate}
+                  format="dd/MM/yyyy"
+                />
+                <DatePicker
+                  label="End date"
+                  onChange={handleEndDateChange}
+                  value={formik.values.endDate}
+                  format="dd/MM/yyyy"
                 />
               </Stack>
               {formik.errors.submit && (

@@ -2,6 +2,7 @@ import type { ChangeEvent, FC, MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
+import Delete from '@untitled-ui/icons-react/build/esm/Delete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -116,7 +117,7 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                 />
               </TableCell>
               <TableCell>Label</TableCell>
-              {/* <TableCell align="right">Actions</TableCell> */}
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -156,24 +157,26 @@ export const SkillListTable: FC<SkillListTableProps> = (props) => {
                       </Typography>
                     </Stack>
                   </TableCell>
-                  {/* <TableCell align="right">
-                    <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.skills.edit}
-                    >
+                  <TableCell align="right">
+                    <IconButton onClick={() => {}}>
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
                     </IconButton>
+                    <IconButton onClick={() => {}}>
+                      <SvgIcon>
+                        <Delete />
+                      </SvgIcon>
+                    </IconButton>
                     <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.skills.details}
+                    // component={RouterLink}
+                    // href={paths.projects.index.replace(':projectId', project._id.toString())}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
-                  </TableCell> */}
+                  </TableCell>
                 </TableRow>
               );
             })}

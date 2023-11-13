@@ -14,11 +14,15 @@ import axios from 'axios';
 
 interface SkillValues {
   label: string;
+  description: string;
+  domain: string;
   submit: null;
 }
 
 const initialValues: SkillValues = {
   label: '',
+  description: '',
+  domain: '',
   submit: null,
 };
 
@@ -131,6 +135,30 @@ export const SkillModal: FC<SkillModalProps> = (props) => {
                   onChange={formik.handleChange}
                   type="text"
                   value={formik.values.label}
+                />
+                <TextField
+                  autoFocus
+                  error={!!(formik.touched.description && formik.errors.description)}
+                  fullWidth
+                  helperText={formik.touched.description && formik.errors.description}
+                  label="Description"
+                  name="label"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="text"
+                  value={formik.values.description}
+                />
+                <TextField
+                  autoFocus
+                  error={!!(formik.touched.domain && formik.errors.domain)}
+                  fullWidth
+                  helperText={formik.touched.domain && formik.errors.domain}
+                  label="Domain"
+                  name="domain"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="text"
+                  value={formik.values.domain}
                 />
               </Stack>
               {formik.errors.submit && (

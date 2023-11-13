@@ -18,6 +18,8 @@ import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Project } from 'src/types/project';
+import { format } from 'date-fns';
 
 const useColumn = (columnId: string): Column | undefined => {
   return useSelector((state) => {
@@ -31,12 +33,9 @@ const Page = () => {
   const settings = useSettings();
   const params = useParams();
   const [board, setBoard] = useState<Board | undefined>();
+  const [project, setProject] = useState<Project | undefined>();
 
   usePageView();
-
-  const todoColumn = useColumn('5e849c39325dc5ef58e5a5db');
-  const progressColumn = useColumn('5e849c2b38d238c33e516755');
-  const doneColumn = useColumn('5e849c2b38d238c33e5146755');
 
   useEffect(() => {
     const getBoard = async () => {
@@ -49,7 +48,18 @@ const Page = () => {
       setBoard(response.data.board);
     };
 
+    const getProject = async () => {
+      const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+      const response = await axios({
+        method: 'get',
+        url: `http://localhost:8080/api/projects/${params.projectId}`,
+        headers: { 'x-access-token': accessToken },
+      });
+      setProject(response.data.project);
+    };
+
     getBoard();
+    getProject();
   }, [params]);
 
   return (
@@ -81,6 +91,104 @@ const Page = () => {
                   <div>
                     <Typography variant="h4">{t(tokens.nav.overview)}</Typography>
                   </div>
+                </Stack>
+              </Grid>
+              <Grid xs={12}>
+                <Stack
+                  justifyContent="space-between"
+                  direction="row"
+                  spacing={6}
+                >
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    spacing={0}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body2"
+                    >
+                      Name
+                    </Typography>
+                    <Typography
+                      color="text.primary"
+                      variant="h6"
+                    >
+                      {project?.name}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    spacing={0}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body2"
+                    >
+                      Client
+                    </Typography>
+                    <Typography
+                      color="text.primary"
+                      variant="h6"
+                    >
+                      {project?.client}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    spacing={0}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body2"
+                    >
+                      Category
+                    </Typography>
+                    <Typography
+                      color="text.primary"
+                      variant="h6"
+                    >
+                      {project?.category}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    spacing={0}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body2"
+                    >
+                      Start date
+                    </Typography>
+                    <Typography
+                      color="text.primary"
+                      variant="h6"
+                    >
+                      {project?.startDate && format(new Date(project?.startDate), 'dd/MM/yyyy')}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    spacing={0}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body2"
+                    >
+                      End Date
+                    </Typography>
+                    <Typography
+                      color="text.primary"
+                      variant="h6"
+                    >
+                      {project?.endDate && format(new Date(project?.endDate), 'dd/MM/yyyy')}
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Grid>
               <Grid

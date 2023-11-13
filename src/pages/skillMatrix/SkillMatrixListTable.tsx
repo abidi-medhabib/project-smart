@@ -1,4 +1,7 @@
 import type { ChangeEvent, FC, MouseEvent } from 'react';
+import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
+import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
+import Delete from '@untitled-ui/icons-react/build/esm/Delete';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,6 +16,7 @@ import Typography from '@mui/material/Typography';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import type { UserSkills } from 'src/types/userSkills';
+import { IconButton, SvgIcon } from '@mui/material';
 
 interface UserSkillsListTableProps {
   count?: number;
@@ -112,7 +116,7 @@ export const SkillMatrixListTable: FC<UserSkillsListTableProps> = (props) => {
               <TableCell>Name</TableCell>
               <TableCell>Skill</TableCell>
               <TableCell>Level</TableCell>
-              {/* <TableCell align="right">Actions</TableCell> */}
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -180,24 +184,26 @@ export const SkillMatrixListTable: FC<UserSkillsListTableProps> = (props) => {
                       </Typography>
                     </Stack>
                   </TableCell>
-                  {/* <TableCell align="right">
-                    <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.userSkillss.edit}
-                    >
+                  <TableCell align="right">
+                    <IconButton onClick={() => {}}>
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
                     </IconButton>
+                    <IconButton onClick={() => {}}>
+                      <SvgIcon>
+                        <Delete />
+                      </SvgIcon>
+                    </IconButton>
                     <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.userSkillss.details}
+                    // component={RouterLink}
+                    // href={paths.projects.index.replace(':projectId', project._id.toString())}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
-                  </TableCell> */}
+                  </TableCell>
                 </TableRow>
               );
             })}

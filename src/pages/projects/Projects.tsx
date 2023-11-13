@@ -147,6 +147,7 @@ const Page = () => {
   const projectsSelection = useSelection<string>(projectsIds);
 
   const [openProjectModal, setOpenProjectModal] = useState<boolean>(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
   const userData = window.sessionStorage.getItem(STORAGE_USER_KEY);
   const [role, setRole] = useState<string | undefined>();
 
@@ -160,6 +161,12 @@ const Page = () => {
   }, [userData]);
 
   const handleTaskOpen = useCallback((): void => {
+    setProjectToEdit(null);
+    setOpenProjectModal(true);
+  }, []);
+
+  const handleEditOpen = useCallback((project: Project): void => {
+    setProjectToEdit(project);
     setOpenProjectModal(true);
   }, []);
 
@@ -228,17 +235,21 @@ const Page = () => {
                 page={projectsSearch.state.page}
                 rowsPerPage={projectsSearch.state.rowsPerPage}
                 selected={projectsSelection.selected}
+                onEditProject={handleEditOpen}
+                onRefresh={() => projectsStore.handleRefresh()}
               />
             </Card>
           </Stack>
         </Container>
       </Box>
-      <ProjectModal
-        onClose={handleTaskClose}
-        open={openProjectModal}
-        projectId={undefined}
-        onRefresh={() => projectsStore.handleRefresh()}
-      />
+      {openProjectModal && (
+        <ProjectModal
+          onClose={handleTaskClose}
+          open={openProjectModal}
+          project={projectToEdit}
+          onRefresh={() => projectsStore.handleRefresh()}
+        />
+      )}
     </>
   );
 };

@@ -706,18 +706,29 @@ export const TaskModal: FC<TaskModalProps> = (props) => {
                     select
                     autoComplete="no"
                   >
-                    {users.map((user) => (
-                      <MenuItem
-                        key={user._id}
-                        value={user._id}
-                      >
-                        {`${user.name} (${
-                          userSkills.filter(
-                            (s) => s.email === user.email && task.labels.includes(s.skill)
-                          ).length
-                        } matching skills)`}
-                      </MenuItem>
-                    ))}
+                    {users
+                      .sort((u1, u2) => {
+                        const u1Score = userSkills
+                          .filter((s) => s.email === u1.email && task.labels.includes(s.skill))
+                          .reduce((a, b) => a + b.level, 0);
+                        const u2Score = userSkills
+                          .filter((s) => s.email === u2.email && task.labels.includes(s.skill))
+                          .reduce((a, b) => a + b.level, 0);
+
+                        return u2Score - u1Score;
+                      })
+                      .map((user) => (
+                        <MenuItem
+                          key={user._id}
+                          value={user._id}
+                        >
+                          {`${user.name} (${
+                            userSkills.filter(
+                              (s) => s.email === user.email && task.labels.includes(s.skill)
+                            ).length
+                          } matching skills)`}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Stack>
               </Grid>

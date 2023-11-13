@@ -2,6 +2,7 @@ import type { ChangeEvent, FC, MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
+import Delete from '@untitled-ui/icons-react/build/esm/Delete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -118,6 +119,7 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
               <TableCell>Name</TableCell>
               <TableCell>Login</TableCell>
               <TableCell>Role</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -185,24 +187,26 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                       </Typography>
                     </Stack>
                   </TableCell>
-                  {/* <TableCell align="right">
-                     <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.users.edit}
-                    >
+                  <TableCell align="right">
+                    <IconButton onClick={() => {}}>
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
-                    </IconButton> */}
-                  {/* <IconButton
-                      component={RouterLink}
-                      href="#" //{paths.dashboard.users.details}
+                    </IconButton>
+                    <IconButton onClick={() => {}}>
+                      <SvgIcon>
+                        <Delete />
+                      </SvgIcon>
+                    </IconButton>
+                    <IconButton
+                    // component={RouterLink}
+                    // href={paths.projects.index.replace(':projectId', project._id.toString())}
                     >
                       <SvgIcon>
                         <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
-                  </TableCell> */}
+                  </TableCell>
                 </TableRow>
               );
             })}
