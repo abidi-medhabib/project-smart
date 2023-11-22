@@ -137,19 +137,17 @@ export const SkillModal: FC<SkillModalProps> = (props) => {
                   value={formik.values.label}
                 />
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.description && formik.errors.description)}
                   fullWidth
                   helperText={formik.touched.description && formik.errors.description}
                   label="Description"
-                  name="label"
+                  name="description"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   type="text"
                   value={formik.values.description}
                 />
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.domain && formik.errors.domain)}
                   fullWidth
                   helperText={formik.touched.domain && formik.errors.domain}
