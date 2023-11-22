@@ -155,7 +155,6 @@ export const SkillMatrixModal: FC<UserSkillsModalProps> = (props) => {
                 spacing={3}
               >
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.user && formik.errors.user)}
                   fullWidth
                   helperText={formik.touched.user && formik.errors.user}
@@ -177,7 +176,6 @@ export const SkillMatrixModal: FC<UserSkillsModalProps> = (props) => {
                   ))}
                 </TextField>
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.skill && formik.errors.skill)}
                   fullWidth
                   helperText={formik.touched.skill && formik.errors.skill}
@@ -199,7 +197,6 @@ export const SkillMatrixModal: FC<UserSkillsModalProps> = (props) => {
                   ))}
                 </TextField>
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.level && formik.errors.level)}
                   fullWidth
                   helperText={formik.touched.level && formik.errors.level}
