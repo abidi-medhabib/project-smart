@@ -147,13 +147,20 @@ const Page = () => {
   const usersSelection = useSelection<string>(usersIds);
 
   const [openUserModal, setOpenUserModal] = useState<boolean>(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
   const handleTaskOpen = useCallback((): void => {
+    setUserToEdit(null);
     setOpenUserModal(true);
   }, []);
 
   const handleTaskClose = useCallback((): void => {
     setOpenUserModal(false);
+  }, []);
+
+  const handleEditOpen = useCallback((user: User): void => {
+    setUserToEdit(user);
+    setOpenUserModal(true);
   }, []);
 
   usePageView();
@@ -215,17 +222,22 @@ const Page = () => {
                 page={usersSearch.state.page}
                 rowsPerPage={usersSearch.state.rowsPerPage}
                 selected={usersSelection.selected}
+                onRefresh={() => usersStore.handleRefresh()}
+                onEditUser={handleEditOpen}
               />
             </Card>
           </Stack>
         </Container>
       </Box>
-      <UserModal
-        onClose={handleTaskClose}
-        open={openUserModal}
-        onRefresh={() => usersStore.handleRefresh()}
-        userId={undefined}
-      />
+      {openUserModal && (
+        <UserModal
+          onClose={handleTaskClose}
+          open={openUserModal}
+          onRefresh={() => usersStore.handleRefresh()}
+          userId={undefined}
+          user={userToEdit}
+        />
+      )}
     </>
   );
 };

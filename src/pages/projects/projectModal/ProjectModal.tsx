@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from 'react';
+import { ChangeEvent, FC, useCallback, useEffect } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
@@ -113,15 +113,15 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
   );
 
   const handleClientChange = useCallback(
-    (value: string): void => {
-      formik.setFieldValue('client', value);
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+      formik.setFieldValue('client', event.target.value);
     },
     [formik]
   );
 
   const handleCategoryChange = useCallback(
-    (value: string): void => {
-      formik.setFieldValue('category', value);
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+      formik.setFieldValue('category', event.target.value);
     },
     [formik]
   );
@@ -202,7 +202,6 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
                   value={formik.values.name}
                 />
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.description && formik.errors.description)}
                   fullWidth
                   helperText={formik.touched.description && formik.errors.description}
@@ -222,7 +221,7 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
                   name="client"
                   value={formik.values.client}
                   onBlur={formik.handleBlur}
-                  onChange={(v) => handleClientChange(v.target.value)}
+                  onChange={handleClientChange}
                   select
                   autoComplete="no"
                 >
@@ -230,17 +229,17 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
                     value=""
                     style={{ height: 40 }}
                   ></MenuItem>
-                  <MenuItem value="Client 1">Client 1</MenuItem>
-                  <MenuItem value="Client 1">Client 2</MenuItem>
-                  <MenuItem value="Client 1">Client 3</MenuItem>
-                  <MenuItem value="Client 1">Client 4</MenuItem>
+                  <MenuItem value="Picard">Picard</MenuItem>
+                  <MenuItem value="Edf">EDF</MenuItem>
+                  <MenuItem value="Steg">STEG</MenuItem>
+                  <MenuItem value="Biat">BIAT</MenuItem>
                 </TextField>
                 <TextField
                   fullWidth
                   label="select a category"
                   name="category"
                   onBlur={formik.handleBlur}
-                  onChange={(v) => handleCategoryChange(v.target.value)}
+                  onChange={handleCategoryChange}
                   select
                   autoComplete="no"
                   value={formik.values.category}
@@ -249,10 +248,10 @@ export const ProjectModal: FC<ProjectModalProps> = (props) => {
                     value=""
                     style={{ height: 40 }}
                   ></MenuItem>
-                  <MenuItem value="Category 1">Category 1</MenuItem>
-                  <MenuItem value="Category 1">Category 2</MenuItem>
-                  <MenuItem value="Category 1">Category 3</MenuItem>
-                  <MenuItem value="Category 1">Category 4</MenuItem>
+                  <MenuItem value="HRAccess">HR access</MenuItem>
+                  <MenuItem value="GP4You">GP4You</MenuItem>
+                  <MenuItem value="BusinessAnalytics">BusinessAnalytics</MenuItem>
+                  <MenuItem value="Q&A">Q&A</MenuItem>
                 </TextField>
                 <DatePicker
                   label="Start date"

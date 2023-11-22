@@ -1,11 +1,11 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { Button, FormHelperText, MenuItem, TextField } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import { Stack } from '@mui/system';
 
-import { Role } from 'src/types/user';
+import { Role, User } from 'src/types/user';
 import { useMounted } from 'src/hooks/use-mounted';
 import { authApi } from 'src/api/auth';
 import { createResourceId } from 'src/utils/create-resource-id';
@@ -42,10 +42,11 @@ interface UserModalProps {
   onRefresh?: () => void;
   open: boolean;
   userId?: string;
+  user: User | null;
 }
 
 export const UserModal: FC<UserModalProps> = (props) => {
-  const { userId, onClose, onRefresh, open = false, ...other } = props;
+  const { userId, user, onClose, onRefresh, open = false, ...other } = props;
   const isMounted = useMounted();
 
   const formik = useFormik({
@@ -54,7 +55,7 @@ export const UserModal: FC<UserModalProps> = (props) => {
     onSubmit: async (values, helpers): Promise<void> => {
       try {
         authApi.saveUser({
-          _id: createResourceId(),
+          _id: user ? user._id : createResourceId(),
           email: values.email,
           name: values.name,
           role: values.role,
@@ -67,6 +68,7 @@ export const UserModal: FC<UserModalProps> = (props) => {
           url: 'http://localhost:8080/api/users',
           headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
           data: {
+            _id: user ? user._id : undefined,
             email: values.email,
             name: values.name,
             role: values.role,
@@ -90,6 +92,20 @@ export const UserModal: FC<UserModalProps> = (props) => {
       }
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      formik.resetForm({
+        values: {
+          email: user.email,
+          password: user.password!,
+          name: user.name,
+          role: user.role,
+          submit: null,
+        },
+      });
+    }
+  }, [user]);
 
   return (
     <Drawer
@@ -155,7 +171,6 @@ export const UserModal: FC<UserModalProps> = (props) => {
                   value={formik.values.name}
                 />
                 <TextField
-                  autoFocus
                   error={!!(formik.touched.email && formik.errors.email)}
                   fullWidth
                   helperText={formik.touched.email && formik.errors.email}
@@ -178,6 +193,7 @@ export const UserModal: FC<UserModalProps> = (props) => {
                   type="password"
                   value={formik.values.password}
                   autoComplete="no"
+                  disabled={user !== null}
                 />
                 <TextField
                   error={!!(formik.touched.role && formik.errors.role)}

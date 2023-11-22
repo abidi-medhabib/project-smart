@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC, MouseEvent } from 'react';
+import { useCallback, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
@@ -20,6 +20,9 @@ import Typography from '@mui/material/Typography';
 import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
 import type { User } from 'src/types/user';
+import axios from 'axios';
+import { TOKEN_STORAGE_KEY } from 'src/contexts/auth/jwt/auth-provider';
+import { Project } from 'src/types/project';
 
 interface UserListTableProps {
   count?: number;
@@ -33,6 +36,8 @@ interface UserListTableProps {
   page?: number;
   rowsPerPage?: number;
   selected?: string[];
+  onRefresh: () => void;
+  onEditUser: (user: User) => void;
 }
 
 export const UserListTable: FC<UserListTableProps> = (props) => {
@@ -45,6 +50,8 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
     onRowsPerPageChange,
     onSelectAll,
     onSelectOne,
+    onRefresh,
+    onEditUser,
     page = 0,
     rowsPerPage = 0,
     selected = [],
@@ -53,6 +60,16 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
   const selectedSome = selected.length > 0 && selected.length < items.length;
   const selectedAll = items.length > 0 && selected.length === items.length;
   const enableBulkActions = selected.length > 0;
+
+  const deleteUser = useCallback(async (user: User) => {
+    const accessToken = window.sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    await axios({
+      method: 'delete',
+      url: `http://localhost:8080/api/users/${user._id}`,
+      headers: { 'Content-Type': 'application/json', 'x-access-token': accessToken },
+    });
+    onRefresh();
+  }, []);
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -188,12 +205,12 @@ export const UserListTable: FC<UserListTableProps> = (props) => {
                     </Stack>
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton onClick={() => {}}>
+                    <IconButton onClick={() => onEditUser(user)}>
                       <SvgIcon>
                         <Edit02Icon />
                       </SvgIcon>
                     </IconButton>
-                    <IconButton onClick={() => {}}>
+                    <IconButton onClick={() => deleteUser(user)}>
                       <SvgIcon>
                         <Delete />
                       </SvgIcon>
